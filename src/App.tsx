@@ -1,4 +1,4 @@
-import { KeyboardEventHandler, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useWaku } from "@waku/react";
 import { createEncoder, createDecoder, RelayNode } from "@waku/sdk";
 import "./App.css";
@@ -13,19 +13,20 @@ interface IDisplayMessage {
   sendedByMe: boolean;
 }
 
+const encoder = createEncoder({
+  contentTopic: CONTENT_TOPIC,
+  pubsubTopic: PUBSUB_TOPIC,
+});
+
+const decoder = createDecoder(CONTENT_TOPIC, PUBSUB_TOPIC);
+
 function App() {
   const [inputMessage, setInputMessage] = useState("");
+  const [peers, setPeers] = useState<string>("[]");
   const [messages, setMessages] = useState<IDisplayMessage[]>([]);
 
   // Create and start a Light Node
   const { node, error, isLoading } = useWaku<RelayNode>();
-
-  const encoder = createEncoder({
-    contentTopic: CONTENT_TOPIC,
-    pubsubTopic: PUBSUB_TOPIC,
-  });
-
-  const decoder = createDecoder(CONTENT_TOPIC, PUBSUB_TOPIC);
 
   useEffect(() => {
     console.log(node, error, isLoading);
@@ -37,16 +38,8 @@ function App() {
         console.log("node started", node.libp2p.peerId.toString());
 
         setInterval(() => {
-          console.log(node.relay.getMeshPeers(PUBSUB_TOPIC)), PUBSUB_TOPIC;
+          setPeers(JSON.stringify(node?.relay.getMeshPeers(PUBSUB_TOPIC)));
         }, 10 * 1000);
-
-        node.relay
-          .send(encoder, {
-            payload: utf8Encode.encode("hello from Buenos Aires"),
-          })
-          .then((x) => console.log(x));
-
-        console.log("listener started");
 
         node.relay.subscribe(decoder, (x) => {
           const message: IDisplayMessage = {
@@ -93,7 +86,7 @@ function App() {
   return (
     <>
       <div className="chat-interface">
-        <h1>Waku React Demo</h1>
+        <p className="peers">{peers}</p>
         <div className="chat-body">
           {messages.map((message, index) => (
             <div key={index} className="chat-message">
