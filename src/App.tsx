@@ -10,7 +10,7 @@ const utf8Decode = new TextDecoder();
 
 function App() {
   const [inputMessage, setInputMessage] = useState("");
-  const [messages] = useState([]);
+  const [messages, setMessages] = useState<string[]>([]);
 
   // Create and start a Light Node
   const { node, error, isLoading } = useWaku<RelayNode>();
@@ -32,9 +32,6 @@ function App() {
         console.log("node started", node.libp2p.peerId.toString());
 
         setInterval(() => {
-          console.log(node.relay.getMeshPeers(CONTENT_TOPIC)), CONTENT_TOPIC;
-        }, 10 * 1000);
-        setInterval(() => {
           console.log(node.relay.getMeshPeers(PUBSUB_TOPIC)), PUBSUB_TOPIC;
         }, 10 * 1000);
 
@@ -46,9 +43,11 @@ function App() {
 
         console.log("listener started");
 
-        node.relay.subscribe(decoder, (x) =>
-          console.log("MESSAGE RECEIVED", utf8Decode.decode(x.payload))
-        );
+        node.relay.subscribe(decoder, (x) => {
+          const message = utf8Decode.decode(x.payload);
+          console.log("MESSAGE RECEIVED", message);
+          setMessages([...messages, message]);
+        });
       });
     }
   }, [node, error, isLoading]);
@@ -75,8 +74,7 @@ function App() {
         <div className="chat-body">
           {messages.map((message, index) => (
             <div key={index} className="chat-message">
-              <span>{new Date(message.timestamp).toUTCString()}</span>
-              <div className="message-text">{message.message}</div>
+              <div className="message-text">{message}</div>
             </div>
           ))}
         </div>
