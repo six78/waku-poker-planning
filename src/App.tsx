@@ -59,9 +59,11 @@ function App() {
   };
 
   const sendMessage = () => {
+    console.log("sending...", inputMessage);
+
     node?.relay
       .send(encoder, {
-        payload: utf8Encode.encode("hello from Buenos Aires"),
+        payload: utf8Encode.encode(inputMessage),
       })
       .then((x) => console.log(x));
   };
