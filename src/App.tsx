@@ -6,6 +6,7 @@ import "./App.css";
 const CONTENT_TOPIC = "/six78/1/helloworld/json";
 const PUBSUB_TOPIC = "/waku/2/default-waku/proto";
 const utf8Encode = new TextEncoder();
+const utf8Decode = new TextDecoder();
 
 function App() {
   const [inputMessage, setInputMessage] = useState("");
@@ -45,7 +46,9 @@ function App() {
 
         console.log("listener started");
 
-        node.relay.subscribe(decoder, (x) => console.log(x));
+        node.relay.subscribe(decoder, (x) =>
+          console.log("MESSAGE RECEIVED", utf8Decode.decode(x.payload))
+        );
       });
     }
   }, [node, error, isLoading]);
@@ -55,7 +58,13 @@ function App() {
     setInputMessage(e.target.value);
   };
 
-  const sendMessage = () => {};
+  const sendMessage = () => {
+    node?.relay
+      .send(encoder, {
+        payload: utf8Encode.encode("hello from Buenos Aires"),
+      })
+      .then((x) => console.log(x));
+  };
 
   return (
     <>
