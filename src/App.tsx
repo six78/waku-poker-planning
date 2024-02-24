@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { KeyboardEventHandler, useEffect, useState } from "react";
 import { useWaku } from "@waku/react";
 import { createEncoder, createDecoder, RelayNode } from "@waku/sdk";
 import "./App.css";
@@ -8,9 +8,14 @@ const PUBSUB_TOPIC = "/waku/2/default-waku/proto";
 const utf8Encode = new TextEncoder();
 const utf8Decode = new TextDecoder();
 
+interface IDisplayMessage {
+  message: string;
+  sendedByMe: boolean;
+}
+
 function App() {
   const [inputMessage, setInputMessage] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<IDisplayMessage[]>([]);
 
   // Create and start a Light Node
   const { node, error, isLoading } = useWaku<RelayNode>();
@@ -44,7 +49,10 @@ function App() {
         console.log("listener started");
 
         node.relay.subscribe(decoder, (x) => {
-          const message = utf8Decode.decode(x.payload);
+          const message: IDisplayMessage = {
+            message: utf8Decode.decode(x.payload),
+            sendedByMe: false,
+          };
           console.log("MESSAGE RECEIVED", message);
           setMessages([...messages, message]);
         });
@@ -64,8 +72,23 @@ function App() {
       .send(encoder, {
         payload: utf8Encode.encode(inputMessage),
       })
-      .then((x) => console.log(x));
+      .then(() => {
+        const message: IDisplayMessage = {
+          message: inputMessage,
+          sendedByMe: true,
+        };
+
+        setMessages([...messages, message]);
+        setInputMessage("");
+      });
   };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function handleKeyDown(event: any) {
+    if (event.code === "Enter") {
+      sendMessage();
+    }
+  }
 
   return (
     <>
@@ -74,7 +97,13 @@ function App() {
         <div className="chat-body">
           {messages.map((message, index) => (
             <div key={index} className="chat-message">
-              <div className="message-text">{message}</div>
+              <div
+                className={
+                  "message-text " + (message.sendedByMe ? "right-side" : "")
+                }
+              >
+                {message.message}
+              </div>
             </div>
           ))}
         </div>
@@ -84,6 +113,7 @@ function App() {
             id="message-input"
             value={inputMessage}
             onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
             placeholder="Type your message..."
           />
           <button className="send-button" onClick={sendMessage}>
