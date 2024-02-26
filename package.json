@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@libp2p/bootstrap": "^10.0.15",
     "@waku/react": "^0.0.5-63a782d",
     "@waku/sdk": "0.0.20",
     "protobufjs": "7.2.6",

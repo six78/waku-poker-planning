@@ -1,39 +1,21 @@
-import { useWaku } from "@waku/react";
-import { RelayNode } from "@waku/sdk";
 import App from "./App";
-import { WakuNodeService } from "./services/waku-node.service";
-import { useEffect, useRef, useState } from "react";
+import {
+  WakuNodeService,
+  WakuNodeServiceFactory,
+} from "./services/waku-node.service";
+import { useEffect, useState } from "react";
+import { CONTENT_TOPIC, PUBSUB_TOPIC } from "./app.const";
+
+const nodeFactory = new WakuNodeServiceFactory(CONTENT_TOPIC, PUBSUB_TOPIC);
 
 function AppInitializer() {
-  const { node: wakuRelayNode } = useWaku<RelayNode>();
-  const [nodeIsReady, setNodeIsReady] = useState(false);
-
+  console.log("INIT");
+  const [node, setNode] = useState<WakuNodeService | null>(null);
   useEffect(() => {
-    wakuRelayNode?.start().then(() => {
-      console.log("WAITING FOR PEERS...");
-      setNodeIsReady(true);
-      wakuRelayNode!.libp2p.addEventListener("peer:update", () => {
-        const peers = wakuRelayNode!.relay.getMeshPeers();
-        if (!nodeIsReady) {
-          console.log("PEERS UPDATED", peers);
-        }
+    nodeFactory.create().then(setNode);
+  }, []);
 
-        if (peers.length > 0 && !nodeIsReady) {
-          setNodeIsReady(true);
-        }
-      });
-    });
-  }, [wakuRelayNode, nodeIsReady, setNodeIsReady]);
-
-  if (!nodeIsReady) {
-    return <></>;
-  }
-
-  // console.log("INITIALIZER RENDERS APP");
-
-  const node = new WakuNodeService(wakuRelayNode!);
-  node.logPeers(10000).logMessages();
-  return <App node={node}></App>;
+  return node ? <App node={node}></App> : <></>;
 }
 
 export default AppInitializer;

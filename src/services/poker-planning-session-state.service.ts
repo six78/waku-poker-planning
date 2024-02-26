@@ -12,11 +12,7 @@ export class PokerPlanningSessionStateService {
   constructor(private readonly hostMessageService: HostMessageService) { }
 
   public init(): this {
-    console.log('HOST LISTENER ENABLED');
-
     this.hostMessageService.onMessageReceived(message => {
-      console.log('HOST LISTENER', message);
-
       switch (message.type) {
         case '__participant_online':
           this.onParticipantOnline(message);

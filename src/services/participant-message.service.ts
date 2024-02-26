@@ -33,6 +33,7 @@ export class ParticipantMessageService {
   public onStateChanged(callback: (state: IState) => void) {
     this.node.subscribe(message => {
       if (message.type === '__state') {
+        console.log('trying apply state', message.state);
         callback(message.state);
       }
     })

@@ -2,6 +2,7 @@ import { IMessage, IParticipantVoteMessage, IStartVotingMessage, IStateMessage }
 import { IState } from '../models/state.model';
 import { ParticipantMessageService } from './participant-message.service';
 
+// TODO: use dealer instead of host
 export class HostMessageService extends ParticipantMessageService {
   public sendState(state: IState): void {
     const message: IStateMessage = {
