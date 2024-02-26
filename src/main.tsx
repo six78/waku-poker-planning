@@ -1,15 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
+import AppInitializer from "./AppInitializer";
 import "./index.css";
-import { RelayNodeProvider } from "@waku/react";
+import { RelayNodeOptions, RelayNodeProvider } from "@waku/react";
 
-const NODE_OPTIONS = { defaultBootstrap: true };
+const NODE_OPTIONS: RelayNodeOptions = {
+  defaultBootstrap: true,
+  emitSelf: true,
+};
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <RelayNodeProvider options={NODE_OPTIONS}>
-      <App />
+      <AppInitializer />
     </RelayNodeProvider>
   </React.StrictMode>
 );
