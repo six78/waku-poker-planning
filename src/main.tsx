@@ -10,9 +10,7 @@ const NODE_OPTIONS: RelayNodeOptions = {
 };
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <RelayNodeProvider options={NODE_OPTIONS}>
-      <AppInitializer />
-    </RelayNodeProvider>
-  </React.StrictMode>
+  <RelayNodeProvider options={NODE_OPTIONS}>
+    <AppInitializer />
+  </RelayNodeProvider>
 );

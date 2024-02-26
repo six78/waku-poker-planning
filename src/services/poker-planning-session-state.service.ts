@@ -9,9 +9,7 @@ export class PokerPlanningSessionStateService {
     voteFor: null
   }
 
-  constructor(private readonly hostMessageService: HostMessageService) {
-
-  }
+  constructor(private readonly hostMessageService: HostMessageService) { }
 
   public init(): this {
     console.log('HOST LISTENER ENABLED');

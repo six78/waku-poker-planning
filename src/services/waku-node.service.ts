@@ -47,7 +47,7 @@ export class WakuNodeService {
   public logMessages(): this {
     this.node.relay.subscribe(this.decoder, (x) => {
       const message = this.decodeUtf8(x.payload);
-      console.log("MESSAGE RECEIVED", message);
+      console.log("RAW MESSAGE RECEIVED", message);
     })
 
     return this;

@@ -33,7 +33,7 @@ function App(props: { node: WakuNodeService }) {
     const moh = new PokerPlanningSessionStateService(sidr);
 
     moh.init().enableIntervalSync(10000);
-  }, []);
+  }, [props.node]);
 
   useEffect(() => {
     participantMessageService.onStateChanged(setState);
