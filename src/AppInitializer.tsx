@@ -2,7 +2,7 @@ import App from "./App";
 import {
   WakuNodeService,
   WakuNodeServiceFactory,
-} from "./services/waku-node.service";
+} from "./waku/waku-node.service";
 import { useEffect, useState } from "react";
 import { CONTENT_TOPIC, PUBSUB_TOPIC } from "./app.const";
 

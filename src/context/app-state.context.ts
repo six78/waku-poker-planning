@@ -1,7 +1,7 @@
 import { createContext } from 'react';
-import { IState } from '../models/state.model';
+import { IGameState } from '../game/game-state.model';
 
-export const AppStateContext = createContext<IState>({
-  participants: [],
+export const AppStateContext = createContext<IGameState>({
+  players: [],
   voteFor: null,
 });

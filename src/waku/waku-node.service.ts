@@ -1,7 +1,7 @@
 import { message } from '@waku/core';
 import { Decoder, Encoder, IFilterSubscription, LightNode, Protocols, createDecoder, createEncoder, createLightNode, waitForRemotePeer } from '@waku/sdk';
 import { wakuDecoder, wakuEncoder } from '../components/app.utils';
-import { IMessage } from '../models/message.model';
+import { IMessage } from '../game/game-message.model';
 import { wakuDnsDiscovery } from "@waku/dns-discovery";
 
 

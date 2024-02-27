@@ -1,28 +1,28 @@
-import { IParticipantOnlineMessage, IParticipantVoteMessage } from '../models/message.model';
-import { IState } from '../models/state.model';
-import { CurrentUserService } from './current-user.service';
-import { WakuNodeService } from './waku-node.service';
+import { IParticipantOnlineMessage, IParticipantVoteMessage } from '../game/game-message.model';
+import { IGameState } from '../game/game-state.model';
+import { CurrentUserService } from '../user/current-user.service';
+import { WakuNodeService } from '../waku/waku-node.service';
 
 // TODO: is it a good naming?
-export class ParticipantMessageService {
+export class PlayerEventsService {
   constructor(
     protected readonly node: WakuNodeService,
     protected readonly currentUserService: CurrentUserService
   ) { }
 
 
-  public sendCurrentUserIsOnline(): void {
+  public playerIsOnline(): void {
     const message: IParticipantOnlineMessage = {
-      type: '__participant_online',
+      type: '__player_online',
       name: this.currentUserService.name
     };
 
     this.node.send(message);
   }
 
-  public sendCurrentUserVote(data: { voteFor: string, voteResult: number }): void {
+  public sendVote(data: { voteFor: string, voteResult: number }): void {
     const message: IParticipantVoteMessage = {
-      type: '__participant_vote',
+      type: '__player_vote',
       name: this.currentUserService.name,
       ...data
     };
@@ -30,7 +30,7 @@ export class ParticipantMessageService {
     this.node.send(message);
   }
 
-  public onStateChanged(callback: (state: IState) => void) {
+  public onStateChanged(callback: (state: IGameState) => void) {
     this.node.subscribe(message => {
       if (message.type === '__state') {
         console.log('trying apply state', message.state);
