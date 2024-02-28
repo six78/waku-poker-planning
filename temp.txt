@@ -1,4 +1,3 @@
-waku-planing-poker@0.0.0 /Users/skyeng/Desktop/development/waku-planing-poker
 ├─┬ @libp2p/bootstrap@10.0.15
 │ ├── @libp2p/interface@1.1.3
 │ ├─┬ @libp2p/peer-id@4.0.6
