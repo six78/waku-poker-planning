@@ -1,4 +1,3 @@
-import { message } from '@waku/core';
 import { Decoder, Encoder, IFilterSubscription, LightNode, Protocols, createDecoder, createEncoder, createLightNode, waitForRemotePeer } from '@waku/sdk';
 import { wakuDecoder, wakuEncoder } from '../components/app.utils';
 import { IMessage } from '../game/game-message.model';
