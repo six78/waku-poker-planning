@@ -1,20 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { DisplayState } from "./components/display-state.component";
 import { AppStateContext } from "./context/app-state.context";
-import { WakuNodeService } from "./waku/waku-node.service";
 import "./App.css";
-import { CurrentUserService } from "./user/current-user.service";
 import { IGameState } from "./game/game-state.model";
 import { PlayerEventsService } from "./player/player-events.service";
 import { GameStateSyncService } from "./dealer/game-state-sync.service";
 import { DealerEventsService } from "./dealer/dealer-events.service";
 import { DeckControlPanel } from "./deck/deck-control-panel.component";
 import { Header } from "./page-layout/header.component";
+import { AppContext } from "./app/app.context";
 
-const currentUserService = new CurrentUserService();
-
-function App(props: { node: WakuNodeService }) {
-  currentUserService.validate();
+function App() {
+  const appContext = useContext(AppContext)!;
 
   const [state, setState] = useState<IGameState>({
     players: [],
@@ -22,20 +19,27 @@ function App(props: { node: WakuNodeService }) {
   });
 
   const participantMessageService = useMemo(
-    () => new PlayerEventsService(props.node, currentUserService),
-    [props.node]
+    () =>
+      new PlayerEventsService(
+        appContext.wakuNodeService,
+        appContext.userService
+      ),
+    [appContext]
   );
 
   useEffect(() => {
-    if (!currentUserService.host) {
+    if (!appContext?.userService.host) {
       return;
     }
 
-    const sidr = new DealerEventsService(props.node, currentUserService);
+    const sidr = new DealerEventsService(
+      appContext.wakuNodeService,
+      appContext.userService
+    );
     const moh = new GameStateSyncService(sidr);
 
     moh.init().enableIntervalSync(10000);
-  }, [props.node]);
+  }, [appContext]);
 
   useEffect(() => {
     participantMessageService.onStateChanged(setState);

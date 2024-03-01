@@ -1,4 +1,4 @@
-import { Callback, Decoder, Encoder, IDecodedMessage, IDecoder, IEncoder, IFilter, IFilterSubscription, ILightPush, IMessage as IWakuMessage, LightNode, Protocols, SendResult, Unsubscribe, createDecoder, createEncoder, createLightNode, waitForRemotePeer } from '@waku/sdk';
+import { Callback, Decoder, Encoder, IDecodedMessage, IDecoder, IEncoder, IFilter, ILightPush, IMessage as IWakuMessage, Protocols, SendResult, Unsubscribe, createDecoder, createEncoder, createLightNode, waitForRemotePeer } from '@waku/sdk';
 import { wakuDecoder, wakuEncoder } from '../components/app.utils';
 import { wakuDnsDiscovery } from "@waku/dns-discovery";
 import { IMessage } from '../game/game-message.model';
@@ -36,7 +36,7 @@ export class WakuNodeServiceFactory {
 
   async create(createFakeNode = false): Promise<WakuNodeService> {
     if (createFakeNode) {
-      return new Promise(r => r(new WakuNodeService(this.contentTopic, this.pubSubTopic, new WakuFakeLightNode())))
+      return new Promise(r => r(new WakuNodeService(new WakuFakeLightNode(), this.contentTopic)))
     }
 
     console.log('CREATING NODE...');
@@ -63,7 +63,7 @@ export class WakuNodeServiceFactory {
 
     console.log('NODE IS READY');
 
-    return new WakuNodeService(this.contentTopic, this.pubSubTopic, node);
+    return new WakuNodeService(node, this.contentTopic);
   }
 }
 
@@ -77,9 +77,8 @@ export class WakuNodeService {
 
   constructor(
 
-    private readonly contentTopic: string,
-    private readonly pubSubTopic: string,
     private readonly node: IWakuLightNode,
+    contentTopic: string,
   ) {
     this.encoder = createEncoder({ contentTopic });
     this.decoder = createDecoder(contentTopic);
@@ -105,62 +104,6 @@ export class WakuNodeService {
 
   public subscribe(callback: (message: IMessage) => void): void {
     this.callbacks.push(callback);
-  }
-
-  private encodeUtf8(message: string): Uint8Array {
-    return this.utf8Encoder.encode(message);
-  }
-
-  private decodeUtf8(message: Uint8Array): string {
-    return this.utf8Decoder.decode(message);
-  }
-}
-
-
-export class WakuNodeService2 {
-  private readonly encoder = wakuEncoder;
-  private readonly decoder = wakuDecoder;
-  private readonly utf8Encoder = new TextEncoder();
-  private readonly utf8Decoder = new TextDecoder();
-
-  constructor(
-    private readonly node: LightNode
-  ) {
-
-  }
-  public send(message: IMessage): void {
-    console.log('SENDING', message);
-
-    this.node.lightPush.send(this.encoder, {
-      payload: this.encodeUtf8(JSON.stringify(message))
-    })
-  }
-
-  public subscribe(callback: (message: IMessage) => void): void {
-    this.node.filter.subscribe(this.decoder, message => {
-      callback(JSON.parse(this.decodeUtf8(message.payload)) as IMessage);
-    });
-  }
-
-  public logPeers(_interval?: number): this {
-    // console.log('PEERS', this.node.filter.getMeshPeers(PUBSUB_TOPIC));
-
-    // if (interval) {
-    //   setInterval(() => {
-    //     console.log('PEERS', this.node.relay.getMeshPeers(PUBSUB_TOPIC));
-    //   }, interval);
-    // }
-
-    return this;
-  }
-
-  public logMessages(): this {
-    this.node.filter.subscribe(this.decoder, (x) => {
-      const message = this.decodeUtf8(x.payload);
-      console.log("RAW MESSAGE RECEIVED", message);
-    })
-
-    return this;
   }
 
   private encodeUtf8(message: string): Uint8Array {

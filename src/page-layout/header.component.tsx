@@ -1,7 +1,9 @@
 import { Button, Form, Input, Modal, Switch } from "antd";
 import { SettingFilled } from "@ant-design/icons";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useFormService } from "../shared/form/form.service";
+import { CurrentUserService } from "../user/current-user.service";
+import { AppContext } from "../app/app.context";
 
 interface ISettings {
   playersName: string;
@@ -9,12 +11,13 @@ interface ISettings {
 }
 
 export function Header() {
+  const appContext = useContext(AppContext)!;
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const formService = useFormService<ISettings>({
     initialValue: {
-      isDealer: true,
-      playersName: "Дидух",
+      isDealer: appContext.userService.host,
+      playersName: appContext.userService.name,
     },
     onFinish: (changes) => {
       console.log(changes);
