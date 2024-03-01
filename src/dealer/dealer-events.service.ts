@@ -1,8 +1,12 @@
+import { IVoteItem } from './../voting/voting.model';
 import { IMessage, IStartVotingMessage, IStateMessage } from '../game/game-message.model';
 import { IGameState } from '../game/game-state.model';
-import { PlayerEventsService } from '../player/player-events.service';
+import { WakuNodeService } from '../waku/waku-node.service';
 
-export class DealerEventsService extends PlayerEventsService {
+export class DealerEventsService {
+  constructor(
+    protected readonly node: WakuNodeService
+  ) { }
   public sendState(state: IGameState): void {
     const message: IStateMessage = {
       type: '__state',
@@ -12,10 +16,10 @@ export class DealerEventsService extends PlayerEventsService {
     this.node.send(message);
   }
 
-  public sendItemToVote(voteFor: string): void {
+  public sendItemToVote(voteItem: IVoteItem): void {
     const message: IStartVotingMessage = {
       type: '__start_voting',
-      voteFor
+      voteItem
     };
 
     this.node.send(message);

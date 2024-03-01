@@ -2,6 +2,7 @@ import { Callback, Decoder, Encoder, IDecodedMessage, IDecoder, IEncoder, IFilte
 import { wakuDecoder, wakuEncoder } from '../components/app.utils';
 import { wakuDnsDiscovery } from "@waku/dns-discovery";
 import { IMessage } from '../game/game-message.model';
+import { appConfig } from '../app/app.config';
 
 interface IWakuLightNode {
   filter: Pick<IFilter, 'subscribe'>,
@@ -34,8 +35,8 @@ export class WakuNodeServiceFactory {
 
   }
 
-  async create(createFakeNode = false): Promise<WakuNodeService> {
-    if (createFakeNode) {
+  async create(): Promise<WakuNodeService> {
+    if (appConfig.fakeNode) {
       return new Promise(r => r(new WakuNodeService(new WakuFakeLightNode(), this.contentTopic)))
     }
 

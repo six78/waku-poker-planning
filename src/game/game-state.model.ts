@@ -1,8 +1,9 @@
 import { PlayerName } from '../player/player.model';
+import { IVoteItem } from '../voting/voting.model';
 
 export interface IGameState {
   players: PlayerName[];
-  voteFor: string | null;
+  voteItem: IVoteItem | null;
 }
 
 

@@ -1,11 +1,11 @@
-import { DealerEventsService } from './dealer-events.service';
-import { IGameState } from '../game/game-state.model';
-import { IParticipantOnlineMessage } from '../game/game-message.model';
+import { DealerEventsService } from '../dealer/dealer-events.service';
+import { IGameState } from './game-state.model';
+import { IParticipantOnlineMessage, IStartVotingMessage } from './game-message.model';
 
 export class GameStateSyncService {
   private state: IGameState = {
     players: [],
-    voteFor: null
+    voteItem: null
   }
 
   constructor(private readonly dealerEventsService: DealerEventsService) { }
@@ -15,6 +15,9 @@ export class GameStateSyncService {
       switch (message.type) {
         case '__player_online':
           this.onParticipantOnline(message);
+          break;
+        case '__start_voting':
+          this.onStartVoting(message);
           break;
         default:
           break;
@@ -38,8 +41,13 @@ export class GameStateSyncService {
     this.state.players.push(message.name);
     this.sendStateToNetwork();
   }
+  private onStartVoting(message: IStartVotingMessage): void {
+    this.state.voteItem = message.voteItem;
+    this.sendStateToNetwork();
+  }
 
   private sendStateToNetwork(): void {
     this.dealerEventsService.sendState(this.state);
   }
+
 }

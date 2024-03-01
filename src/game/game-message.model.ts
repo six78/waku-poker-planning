@@ -1,3 +1,4 @@
+import { IVoteItem } from '../voting/voting.model';
 import { IGameState } from './game-state.model';
 
 export type IMessage = IDealerMessage | IPlayerMessage;
@@ -6,7 +7,7 @@ export type IDealerMessage = IStateMessage | IStartVotingMessage;
 
 export interface IStartVotingMessage {
   type: '__start_voting';
-  voteFor: string;
+  voteItem: IVoteItem;
 }
 
 export interface IStateMessage {

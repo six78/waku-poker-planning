@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AppStateContext } from "../context/app-state.context";
+import { AppStateContext } from "../app/app-state.context";
 import { Card } from "antd";
 
 export function DisplayState() {

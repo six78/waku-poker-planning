@@ -1,10 +1,10 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { DisplayState } from "./components/display-state.component";
-import { AppStateContext } from "./context/app-state.context";
+import { AppStateContext } from "./app/app-state.context";
 import "./App.css";
 import { IGameState } from "./game/game-state.model";
 import { PlayerEventsService } from "./player/player-events.service";
-import { GameStateSyncService } from "./dealer/game-state-sync.service";
+import { GameStateSyncService } from "./game/game-state-sync.service";
 import { DealerEventsService } from "./dealer/dealer-events.service";
 import { DeckControlPanel } from "./deck/deck-control-panel.component";
 import { Header } from "./page-layout/header.component";

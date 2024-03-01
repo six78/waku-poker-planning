@@ -2,7 +2,6 @@ import { Button, Form, Input, Modal, Switch } from "antd";
 import { SettingFilled } from "@ant-design/icons";
 import { useContext, useState } from "react";
 import { useFormService } from "../shared/form/form.service";
-import { CurrentUserService } from "../user/current-user.service";
 import { AppContext } from "../app/app.context";
 
 interface ISettings {
