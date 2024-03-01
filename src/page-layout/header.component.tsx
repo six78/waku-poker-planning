@@ -24,7 +24,10 @@ export function Header() {
         appContext.userService.update({
           id: appContext.userService.id,
           name: changes.playersName || appContext.userService.name,
-          isDealer: changes.isDealer || appContext.userService.host,
+          isDealer:
+            changes.isDealer === undefined
+              ? appContext.userService.host
+              : changes.isDealer,
         });
       }
       console.log(changes);
