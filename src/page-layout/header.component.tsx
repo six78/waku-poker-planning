@@ -20,6 +20,13 @@ export function Header() {
       playersName: appContext.userService.name,
     },
     onFinish: (changes) => {
+      if (changes) {
+        appContext.userService.update({
+          id: appContext.userService.id,
+          name: changes.playersName || appContext.userService.name,
+          isDealer: changes.isDealer || appContext.userService.host,
+        });
+      }
       console.log(changes);
     },
   });

@@ -60,4 +60,11 @@ export class CurrentUserService extends BaseUserService {
     this.name = data.name;
     this.host = data.isDealer;
   }
+
+  public update(model: IUserModel): void {
+    this.saveToStorage(model)
+
+    // TODO: 
+    location.reload();
+  }
 }

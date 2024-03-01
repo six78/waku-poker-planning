@@ -18,6 +18,7 @@ function App() {
     voteFor: null,
   });
 
+  // TODO: в контекст
   const participantMessageService = useMemo(
     () =>
       new PlayerEventsService(
@@ -44,6 +45,10 @@ function App() {
   useEffect(() => {
     participantMessageService.onStateChanged(setState);
     participantMessageService.playerIsOnline();
+
+    setTimeout(() => {
+      participantMessageService.playerIsOnline();
+    }, 10 * 1000);
   }, [participantMessageService]);
 
   return (
