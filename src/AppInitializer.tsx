@@ -5,17 +5,25 @@ import {
 } from "./waku/waku-node.service";
 import { useEffect, useState } from "react";
 import { CONTENT_TOPIC, PUBSUB_TOPIC } from "./app.const";
+import { StyleProvider } from "@ant-design/cssinjs";
 
 const nodeFactory = new WakuNodeServiceFactory(CONTENT_TOPIC, PUBSUB_TOPIC);
 
 function AppInitializer() {
-  console.log("INIT");
   const [node, setNode] = useState<WakuNodeService | null>(null);
   useEffect(() => {
-    nodeFactory.create().then(setNode);
+    nodeFactory.create(true).then(setNode);
   }, []);
 
-  return node ? <App node={node}></App> : <></>;
+  if (!node) {
+    return <></>;
+  }
+
+  return (
+    <StyleProvider hashPriority="high">
+      <App node={node}></App>
+    </StyleProvider>
+  );
 }
 
 export default AppInitializer;

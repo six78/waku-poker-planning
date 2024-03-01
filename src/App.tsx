@@ -8,6 +8,8 @@ import { IGameState } from "./game/game-state.model";
 import { PlayerEventsService } from "./player/player-events.service";
 import { GameStateSyncService } from "./dealer/game-state-sync.service";
 import { DealerEventsService } from "./dealer/dealer-events.service";
+import { DeckControlPanel } from "./deck/deck-control-panel.component";
+import { Header } from "./page-layout/header.component";
 
 const currentUserService = new CurrentUserService();
 
@@ -42,7 +44,15 @@ function App(props: { node: WakuNodeService }) {
 
   return (
     <AppStateContext.Provider value={state}>
-      <DisplayState></DisplayState>
+      <div className="w-screen h-screen">
+        <div className="h-14 drop-shadow-md">
+          <Header></Header>
+        </div>
+        <div className="p-8 grid grid-cols-2 gap-4">
+          <DisplayState></DisplayState>
+          <DeckControlPanel></DeckControlPanel>
+        </div>
+      </div>
     </AppStateContext.Provider>
   );
 }

@@ -1,7 +1,29 @@
-import { Decoder, Encoder, IFilterSubscription, LightNode, Protocols, createDecoder, createEncoder, createLightNode, waitForRemotePeer } from '@waku/sdk';
+import { Callback, Decoder, Encoder, IDecodedMessage, IDecoder, IEncoder, IFilter, IFilterSubscription, ILightPush, IMessage as IWakuMessage, LightNode, Protocols, SendResult, Unsubscribe, createDecoder, createEncoder, createLightNode, waitForRemotePeer } from '@waku/sdk';
 import { wakuDecoder, wakuEncoder } from '../components/app.utils';
-import { IMessage } from '../game/game-message.model';
 import { wakuDnsDiscovery } from "@waku/dns-discovery";
+import { IMessage } from '../game/game-message.model';
+
+interface IWakuLightNode {
+  filter: Pick<IFilter, 'subscribe'>,
+  lightPush: Pick<ILightPush, 'send'>
+}
+
+class WakuFakeLightNode implements IWakuLightNode {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private subscribe: <T extends IDecodedMessage>(decoders: IDecoder<T> | IDecoder<T>[], callback: Callback<T>) => Unsubscribe | Promise<Unsubscribe> = (_, __) => () => new Promise(r => r());
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private send: (encoder: IEncoder, message: IWakuMessage) => Promise<SendResult> = (_, __) => new Promise(resolve => resolve({
+    recipients: []
+  }))
+
+  public filter = {
+    subscribe: this.subscribe
+  }
+
+  public lightPush = {
+    send: this.send
+  };
+}
 
 
 export class WakuNodeServiceFactory {
@@ -12,7 +34,11 @@ export class WakuNodeServiceFactory {
 
   }
 
-  async create(): Promise<WakuNodeService> {
+  async create(createFakeNode = false): Promise<WakuNodeService> {
+    if (createFakeNode) {
+      return new Promise(r => r(new WakuNodeService(this.contentTopic, this.pubSubTopic, new WakuFakeLightNode())))
+    }
+
     console.log('CREATING NODE...');
     const node = await createLightNode({
       libp2p: {
@@ -35,10 +61,9 @@ export class WakuNodeServiceFactory {
     ]);
     console.log('NODE PEERS AWAITED, WAITING FOR SUBSCRIPTION...');
 
-    const subscription = await node.filter.createSubscription();
     console.log('NODE IS READY');
 
-    return new WakuNodeService(this.contentTopic, this.pubSubTopic, node, subscription);
+    return new WakuNodeService(this.contentTopic, this.pubSubTopic, node);
   }
 }
 
@@ -54,8 +79,7 @@ export class WakuNodeService {
 
     private readonly contentTopic: string,
     private readonly pubSubTopic: string,
-    private readonly node: LightNode,
-    private readonly subscription: IFilterSubscription,
+    private readonly node: IWakuLightNode,
   ) {
     this.encoder = createEncoder({ contentTopic });
     this.decoder = createDecoder(contentTopic);
@@ -118,7 +142,7 @@ export class WakuNodeService2 {
     });
   }
 
-  public logPeers(interval?: number): this {
+  public logPeers(_interval?: number): this {
     // console.log('PEERS', this.node.filter.getMeshPeers(PUBSUB_TOPIC));
 
     // if (interval) {
