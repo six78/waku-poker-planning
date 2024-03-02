@@ -5,7 +5,7 @@ import { createContext } from 'react';
 
 export interface IAppContext {
   userService: CurrentUserService,
-  wakuNodeService: WakuNodeService
+  wakuNodeService: WakuNodeService,
 }
 
 export const AppContext = createContext<IAppContext | null>(null);

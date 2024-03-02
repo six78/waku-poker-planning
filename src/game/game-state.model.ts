@@ -4,6 +4,7 @@ import { IVoteItem } from '../voting/voting.model';
 export interface IGameState {
   players: PlayerName[];
   voteItem: IVoteItem | null;
+  tempVoteResults: { [key: string]: number } | null
 }
 
 

@@ -1,55 +1,24 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { DisplayState } from "./components/display-state.component";
 import { AppStateContext } from "./app/app-state.context";
 import "./App.css";
 import { IGameState } from "./game/game-state.model";
-import { PlayerEventsService } from "./player/player-events.service";
-import { GameStateSyncService } from "./game/game-state-sync.service";
-import { DealerEventsService } from "./dealer/dealer-events.service";
 import { DeckControlPanel } from "./deck/deck-control-panel.component";
 import { Header } from "./page-layout/header.component";
-import { AppContext } from "./app/app.context";
+import { usePlayerContext } from "./player/player.context";
+import { appConfig } from "./app/app.config";
 
 function App() {
-  const appContext = useContext(AppContext)!;
+  const playerService = usePlayerContext()!;
 
   const [state, setState] = useState<IGameState>({
     players: [],
-    voteFor: null,
+    voteItem: appConfig.mockedVoteCongif,
   });
 
-  // TODO: в контекст
-  const participantMessageService = useMemo(
-    () =>
-      new PlayerEventsService(
-        appContext.wakuNodeService,
-        appContext.userService
-      ),
-    [appContext]
-  );
-
   useEffect(() => {
-    if (!appContext?.userService.host) {
-      return;
-    }
-
-    const sidr = new DealerEventsService(
-      appContext.wakuNodeService,
-      appContext.userService
-    );
-    const moh = new GameStateSyncService(sidr);
-
-    moh.init().enableIntervalSync(10000);
-  }, [appContext]);
-
-  useEffect(() => {
-    participantMessageService.onStateChanged(setState);
-    participantMessageService.playerIsOnline();
-
-    setTimeout(() => {
-      participantMessageService.playerIsOnline();
-    }, 10 * 1000);
-  }, [participantMessageService]);
+    playerService.onStateChanged(setState).enableHeartBeat();
+  }, [playerService]);
 
   return (
     <AppStateContext.Provider value={state}>

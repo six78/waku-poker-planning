@@ -1,29 +1,27 @@
-import { IParticipantOnlineMessage, IParticipantVoteMessage } from '../game/game-message.model';
+import { IParticipantOnlineMessage, IPlayerVoteMessage } from '../game/game-message.model';
 import { IGameState } from '../game/game-state.model';
-import { CurrentUserService } from '../user/current-user.service';
 import { WakuNodeService } from '../waku/waku-node.service';
+import { PlayerName } from './player.model';
 
 // TODO: is it a good naming?
 export class PlayerEventsService {
   constructor(
-    protected readonly node: WakuNodeService,
-    protected readonly currentUserService: CurrentUserService
+    protected readonly node: WakuNodeService
   ) { }
 
 
-  public playerIsOnline(): void {
+  public playerIsOnline(name: PlayerName): void {
     const message: IParticipantOnlineMessage = {
       type: '__player_online',
-      name: this.currentUserService.name
+      name: name
     };
 
     this.node.send(message);
   }
 
-  public sendVote(data: { voteFor: string, voteResult: number }): void {
-    const message: IParticipantVoteMessage = {
+  public sendVote(data: Omit<IPlayerVoteMessage, 'type'>): void {
+    const message: IPlayerVoteMessage = {
       type: '__player_vote',
-      name: this.currentUserService.name,
       ...data
     };
 

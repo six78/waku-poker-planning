@@ -8,29 +8,44 @@ import App from "../App";
 import { Spin } from "antd";
 import { CurrentUserService } from "../user/current-user.service";
 import { AppContext, IAppContext } from "./app.context";
+import { PlayerService } from "../player/player.service";
+import { PlayerContext } from "../player/player.context";
 
 const nodeFactory = new WakuNodeServiceFactory(CONTENT_TOPIC, PUBSUB_TOPIC);
 
 export function AppInitializer() {
   const [node, setNode] = useState<WakuNodeService | null>(null);
-  const [appContext, setAppContext] = useState<IAppContext | null>();
+  const [appContext, setAppContext] = useState<IAppContext | null>(null);
+  const [playerService, setPlayerService] = useState<PlayerService | null>(
+    null
+  );
 
   useEffect(() => {
     nodeFactory.create().then(setNode);
   }, []);
 
   useEffect(() => {
+    if (!node) {
+      return;
+    }
+
+    const userService = new CurrentUserService();
+
     if (node) {
       setAppContext({
-        userService: new CurrentUserService(),
+        userService,
         wakuNodeService: node,
       });
+
+      setPlayerService(new PlayerService(node, userService));
     }
   }, [node]);
 
   return appContext ? (
     <AppContext.Provider value={appContext}>
-      <App></App>
+      <PlayerContext.Provider value={playerService}>
+        <App></App>
+      </PlayerContext.Provider>
     </AppContext.Provider>
   ) : (
     <div className="h-screen w-screen flex justify-center items-center">

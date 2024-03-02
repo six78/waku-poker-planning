@@ -1,7 +1,9 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 import { IGameState } from '../game/game-state.model';
 
 export const AppStateContext = createContext<IGameState>({
   players: [],
-  voteFor: null,
+  voteItem: null,
 });
+
+export const useAppState = () => useContext(AppStateContext);

@@ -12,9 +12,8 @@ export function DealerControlPanel() {
   const appContext = useContext(AppContext);
 
   useEffect(() => {
-    console.log("lala");
     setDealerService(new DealerService(appContext!.wakuNodeService));
-  }, []);
+  }, [appContext]);
 
   if (!dealerService) {
     return <></>;
