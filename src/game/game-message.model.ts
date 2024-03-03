@@ -3,17 +3,16 @@ import { IVoteItem } from '../voting/voting.model';
 import { IGameState } from './game-state.model';
 
 export type IMessage = IDealerMessage | IPlayerMessage;
-
 export type IDealerMessage = IStateMessage | IStartVotingMessage;
-
-export interface IStartVotingMessage {
-  type: '__start_voting';
-  voteItem: IVoteItem;
-}
 
 export interface IStateMessage {
   type: '__state';
   state: IGameState;
+}
+
+export interface IStartVotingMessage {
+  type: '__start_voting';
+  voteItem: IVoteItem;
 }
 
 export type IPlayerMessage = IParticipantOnlineMessage | IPlayerVoteMessage;

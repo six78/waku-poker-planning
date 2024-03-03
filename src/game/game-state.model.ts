@@ -14,7 +14,7 @@ export interface IGameState {
 //   description: string;
 //   url: string;
 //   votes: { [key: ParticipantName]: number };
-//   voteResult?: number;
+//   voteResult?: number;`
 // }
 
 // interface IParticipant {

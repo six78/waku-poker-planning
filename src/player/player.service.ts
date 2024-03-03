@@ -4,14 +4,16 @@ import { WakuNodeService } from '../waku/waku-node.service';
 import { PlayerEventsService } from './player-events.service';
 
 export class PlayerService {
+  public readonly playerId: string;
   private readonly events: PlayerEventsService;
   constructor(node: WakuNodeService, private readonly userService: CurrentUserService) {
     this.events = new PlayerEventsService(node);
+    this.playerId = this.userService.id;
   }
 
-  public vote(voteFor: string, voteResult: number): void {
+  public vote(voteFor: string, voteResult: number | null): void {
     this.events.sendVote({
-      voteBy: this.userService.name,
+      voteBy: this.userService.id,
       voteFor,
       voteResult
     })

@@ -22,6 +22,7 @@ export class GameStateSyncService {
           break;
         case '__player_vote':
           this.onPlayerVote(message);
+          break;
         default:
           break;
       }

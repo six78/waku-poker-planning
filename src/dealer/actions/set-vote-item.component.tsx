@@ -1,10 +1,10 @@
 import { Button, Form, Input, Modal } from "antd";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useFormService } from "../../shared/form/form.service";
-import { DealerContext, useDealerContext } from "../dealer.context";
+import { useDealerContext } from "../dealer.context";
 import { generateGuid } from "../../shared/guid";
 
-interface IVoteItemSettings {
+interface IVoteItemModel {
   title: string;
 }
 
@@ -12,7 +12,7 @@ export function SetVoteItem() {
   const dealerService = useDealerContext()!;
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const formService = useFormService<IVoteItemSettings>({
+  const formService = useFormService<IVoteItemModel>({
     initialValue: {
       title: "",
     },

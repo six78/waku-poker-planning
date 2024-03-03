@@ -14,10 +14,12 @@ function App() {
   const [state, setState] = useState<IGameState>({
     players: [],
     voteItem: appConfig.mockedVoteCongif,
+    tempVoteResults: null,
   });
 
   useEffect(() => {
-    playerService.onStateChanged(setState).enableHeartBeat();
+    playerService.onStateChanged(setState);
+    //.enableHeartBeat();
   }, [playerService]);
 
   return (
