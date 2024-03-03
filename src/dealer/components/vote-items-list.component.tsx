@@ -1,6 +1,5 @@
-import Markdown from "react-markdown";
-import { Button, Card } from "antd";
-import { DeleteOutlined, ExportOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import { IVoteItem } from "../../voting/voting.model";
 import { useDealerContext } from "../dealer.context";
 
@@ -14,34 +13,29 @@ export function VoteItemsList(props: { issues: IVoteItem[] }) {
   return (
     <div>
       {props.issues.map((x) => (
-        <Card
+        <div
           key={x.id}
-          className="max-w-full mb-2"
-          title={x.name}
-          actions={[
-            <DeleteOutlined key="delete" style={{ color: "#E02424" }} />,
-            <Button
-              onClick={startVoting.bind(undefined, x)}
-              type="primary"
-              key="setting"
-            >
-              Vote
-            </Button>,
-          ]}
-          extra={
-            x.url && (
-              <a href={x.url} target="_blank">
-                <ExportOutlined />
-              </a>
-            )
-          }
+          className="text-gray-900 border border-sky-600 rounded p-2 mb-4 flex items-center"
         >
-          {x.description ? (
-            <Markdown>{x.description}</Markdown>
+          {x.url ? (
+            <a className="text-sky-600 grow" href={x.url}>
+              {x.name}
+            </a>
           ) : (
-            "No description"
+            <span className="grow">{x.name}</span>
           )}
-        </Card>
+          <Button
+            className="mx-2"
+            type="primary"
+            danger
+            ghost
+            icon={<DeleteOutlined />}
+          />
+
+          <Button onClick={startVoting.bind(undefined, x)} type="primary">
+            Vote
+          </Button>
+        </div>
       ))}
     </div>
   );
