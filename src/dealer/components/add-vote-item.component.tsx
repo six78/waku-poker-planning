@@ -7,6 +7,7 @@ const parser = new IssueParsingService();
 
 export function AddVoteItem(props: { addIssue: (issue: IVoteItem) => void }) {
   const [value, setValue] = useState("");
+  const [loading, setLoading] = useState(false);
 
   function onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -15,8 +16,11 @@ export function AddVoteItem(props: { addIssue: (issue: IVoteItem) => void }) {
   }
 
   function onAdd(): void {
+    setLoading(true);
     parser.createIssueFromString(value).then((x) => {
       console.log(x);
+      setLoading(false);
+      setValue("");
       props.addIssue(x);
     });
   }
@@ -32,6 +36,7 @@ export function AddVoteItem(props: { addIssue: (issue: IVoteItem) => void }) {
       ></Input>
       <Button
         disabled={value.length === 0}
+        loading={loading}
         type="primary"
         className="justify-self-end"
         onClick={onAdd}
