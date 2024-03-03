@@ -45,7 +45,7 @@ export class UserActivationService extends BaseUserService {
 export class CurrentUserService extends BaseUserService {
   public readonly id: string;
   public readonly name: string;
-  public readonly host: boolean;
+  public readonly isDealer: boolean;
 
   constructor() {
     super();
@@ -58,7 +58,7 @@ export class CurrentUserService extends BaseUserService {
 
     this.id = data.id;
     this.name = data.name;
-    this.host = data.isDealer;
+    this.isDealer = data.isDealer;
   }
 
   public update(model: IUserModel): void {

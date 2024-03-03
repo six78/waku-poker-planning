@@ -15,7 +15,7 @@ export function Header() {
 
   const formService = useFormService<ISettings>({
     initialValue: {
-      isDealer: appContext.userService.host,
+      isDealer: appContext.userService.isDealer,
       playersName: appContext.userService.name,
     },
     onFinish: (changes) => {
@@ -25,7 +25,7 @@ export function Header() {
           name: changes.playersName || appContext.userService.name,
           isDealer:
             changes.isDealer === undefined
-              ? appContext.userService.host
+              ? appContext.userService.isDealer
               : changes.isDealer,
         });
       }

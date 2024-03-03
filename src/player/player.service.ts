@@ -5,10 +5,12 @@ import { PlayerEventsService } from './player-events.service';
 
 export class PlayerService {
   public readonly playerId: string;
+  public readonly isDealer: boolean;
   private readonly events: PlayerEventsService;
   constructor(node: WakuNodeService, private readonly userService: CurrentUserService) {
     this.events = new PlayerEventsService(node);
     this.playerId = this.userService.id;
+    this.isDealer = userService.isDealer;
   }
 
   public vote(voteFor: string, voteResult: number | null): void {

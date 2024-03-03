@@ -7,6 +7,7 @@ import { DeckControlPanel } from "./deck/deck-control-panel.component";
 import { Header } from "./page-layout/header.component";
 import { usePlayerContext } from "./player/player.context";
 import { appConfig } from "./app/app.config";
+import { DealerControlPanel } from "./dealer/dealer-control-panel.component";
 
 function App() {
   const playerService = usePlayerContext()!;
@@ -24,14 +25,21 @@ function App() {
 
   return (
     <AppStateContext.Provider value={state}>
-      <div className="w-screen h-screen">
-        <div className="h-14 drop-shadow-md">
-          <Header></Header>
+      <div className="w-screen h-screen flex">
+        <div className=" flex-grow">
+          <div className="h-14 drop-shadow-md">
+            <Header></Header>
+          </div>
+          <div className="p-8" asd="grid grid-cols-2 gap-4">
+            <DisplayState></DisplayState>
+            <DeckControlPanel></DeckControlPanel>
+          </div>
         </div>
-        <div className="p-8 grid grid-cols-2 gap-4">
-          <DisplayState></DisplayState>
-          <DeckControlPanel></DeckControlPanel>
-        </div>
+        {playerService.isDealer && (
+          <div className="w-96">
+            <DealerControlPanel />
+          </div>
+        )}
       </div>
     </AppStateContext.Provider>
   );
