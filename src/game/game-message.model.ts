@@ -1,18 +1,11 @@
 import { PlayerName } from '../player/player.model';
-import { IVoteItem } from '../voting/voting.model';
 import { IGameState } from './game-state.model';
 
-export type IMessage = IDealerMessage | IPlayerMessage;
-export type IDealerMessage = IStateMessage | IStartVotingMessage;
+export type IMessage = IPlayerMessage | IStateMessage;
 
 export interface IStateMessage {
   type: '__state';
   state: IGameState;
-}
-
-export interface IStartVotingMessage {
-  type: '__start_voting';
-  voteItem: IVoteItem;
 }
 
 export type IPlayerMessage = IParticipantOnlineMessage | IPlayerVoteMessage;

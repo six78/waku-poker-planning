@@ -3,6 +3,7 @@ import { IVoteItem } from '../voting/voting.model';
 import { WakuNodeService } from '../waku/waku-node.service';
 import { DealerEventsService } from './dealer-events.service';
 
+// TODO: возможно этот класс не нужон
 export class DealerService {
   private readonly events: DealerEventsService;
   private readonly gameStateSyncService: GameStateSyncService;
@@ -16,6 +17,6 @@ export class DealerService {
   }
 
   public setVoteItem(item: IVoteItem): void {
-    this.events.sendItemToVote(item);
+    this.gameStateSyncService.startVoting(item);
   }
 }
