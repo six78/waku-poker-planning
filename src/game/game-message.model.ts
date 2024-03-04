@@ -1,4 +1,4 @@
-import { PlayerName } from '../player/player.model';
+import { IPlayer, PlayerName } from '../player/player.model';
 import { IGameState } from './game-state.model';
 
 export type IMessage = IPlayerMessage | IStateMessage;
@@ -12,7 +12,7 @@ export type IPlayerMessage = IParticipantOnlineMessage | IPlayerVoteMessage;
 
 export interface IParticipantOnlineMessage {
   type: '__player_online';
-  name: string;
+  player: IPlayer
 }
 
 export interface IPlayerVoteMessage {

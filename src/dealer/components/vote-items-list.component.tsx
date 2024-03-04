@@ -2,13 +2,17 @@ import { Button } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { IVoteItem } from "../../voting/voting.model";
 import { useDealerContext } from "../dealer.context";
+import { useAppState } from "../../app/app-state.context";
 
 export function VoteItemsList(props: { issues: IVoteItem[] }) {
+  const { voteItem, players, tempVoteResults } = useAppState();
   const dealer = useDealerContext();
 
   function startVoting(item: IVoteItem): void {
     dealer?.setVoteItem(item);
   }
+
+  function submitVoting(): void {}
 
   return (
     <div>
@@ -32,9 +36,16 @@ export function VoteItemsList(props: { issues: IVoteItem[] }) {
             icon={<DeleteOutlined />}
           />
 
-          <Button onClick={startVoting.bind(undefined, x)} type="primary">
-            Vote
-          </Button>
+          {voteItem && voteItem.id === x.id ? (
+            <Button onClick={startVoting.bind(undefined, x)} type="primary">
+              Submit {Object.keys(tempVoteResults || {}).length}/
+              {players.length}
+            </Button>
+          ) : (
+            <Button onClick={startVoting.bind(undefined, x)} type="primary">
+              Vote
+            </Button>
+          )}
         </div>
       ))}
     </div>

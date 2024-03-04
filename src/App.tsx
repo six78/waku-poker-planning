@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { DisplayState } from "./components/display-state.component";
 import { AppStateContext } from "./app/app-state.context";
 import "./App.css";
 import { IGameState } from "./game/game-state.model";
-import { DeckControlPanel } from "./deck/deck-control-panel.component";
+import { Deck } from "./deck/deck.component";
 import { Header } from "./page-layout/header.component";
 import { usePlayerContext } from "./player/player.context";
 import { appConfig } from "./app/app.config";
@@ -19,24 +18,22 @@ function App() {
   });
 
   useEffect(() => {
-    playerService.onStateChanged(setState);
-    //.enableHeartBeat();
+    playerService.onStateChanged(setState).enableHeartBeat();
   }, [playerService]);
 
   return (
     <AppStateContext.Provider value={state}>
       <div className="w-screen h-screen flex">
-        <div className=" flex-grow">
+        <div className="flex flex-col flex-grow">
           <div className="h-14 drop-shadow-md">
             <Header></Header>
           </div>
-          <div className="p-8" asd="grid grid-cols-2 gap-4">
-            <DisplayState></DisplayState>
-            <DeckControlPanel></DeckControlPanel>
+          <div className="flex-grow overflow-auto">
+            <Deck></Deck>
           </div>
         </div>
         {playerService.isDealer && (
-          <div className="w-96">
+          <div className="w-96 border-l border-gray-300">
             <DealerControlPanel />
           </div>
         )}

@@ -42,11 +42,11 @@ export class GameStateSyncService {
   }
 
   private onParticipantOnline(message: IParticipantOnlineMessage): void {
-    if (this.state.players.some(participant => participant === message.name)) {
+    if (this.state.players.some(participant => participant.id === message.player.id)) {
       return;
     }
 
-    this.state.players.push(message.name);
+    this.state.players.push(message.player);
     this.sendStateToNetwork();
   }
 

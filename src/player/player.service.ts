@@ -27,10 +27,15 @@ export class PlayerService {
   }
 
   public enableHeartBeat(): this {
-    this.events.playerIsOnline(this.userService.name);
+    const player = {
+      id: this.userService.id,
+      name: this.userService.name
+    }
+
+    this.events.playerIsOnline(player);
 
     setTimeout(() => {
-      this.events.playerIsOnline(this.userService.name);
+      this.events.playerIsOnline(player);
     }, 10 * 1000);
 
     return this;

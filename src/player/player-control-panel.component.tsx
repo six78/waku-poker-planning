@@ -48,7 +48,6 @@ export function PlayerControlPanel() {
     <Card>
       {voteItem && (
         <div>
-          <h3>Vote for {voteItem.name}</h3>
           <div className="grid grid-cols-12">
             {votes.map((x) => (
               <VoteOption
