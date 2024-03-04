@@ -1,6 +1,7 @@
 export type PlayerName = string;
+export type PlayerId = string;
 
 export interface IPlayer {
-  id: string;
+  id: PlayerId;
   name: PlayerName;
 }

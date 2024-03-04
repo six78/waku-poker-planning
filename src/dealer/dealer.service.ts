@@ -19,4 +19,8 @@ export class DealerService {
   public setVoteItem(item: IVoteItem): void {
     this.gameStateSyncService.startVoting(item);
   }
+
+  public endVoting(): void {
+    this.gameStateSyncService.endVoting();
+  }
 }

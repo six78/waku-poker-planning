@@ -8,7 +8,11 @@ export function PlayersList() {
     <Space>
       {players.map((player) => {
         const vote = (tempVoteResults || {})[player.id];
-        return <Tag color={vote ? "green" : "blue"}>{player.name}</Tag>;
+        return (
+          <Tag key={player.id} color={vote ? "green" : "blue"}>
+            {player.name}
+          </Tag>
+        );
       })}
     </Space>
   );
