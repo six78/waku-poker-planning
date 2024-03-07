@@ -1,7 +1,7 @@
 import { Card, Spin } from "antd";
-import { useAppState } from "../app/app-state.context";
 import { ReactNode, useState } from "react";
-import { usePlayerContext } from "./player.context";
+import { usePlayer } from "./player.context";
+import { useGame } from "../app/app-state.context";
 
 const votes = [1, 2, 3, 5, 8, 13, 21, 34, 50];
 
@@ -30,8 +30,8 @@ function VoteOption(props: {
 }
 
 export function PlayerControlPanel() {
-  const { voteItem, tempVoteResults } = useAppState();
-  const playerService = usePlayerContext()!;
+  const { voteItem, tempVoteResults } = useGame();
+  const playerService = usePlayer()!;
   const statePlayerVote = (tempVoteResults || {})[playerService.playerId];
   const [lastPlayerVote, setLastPlayerVote] = useState<number | null>(null);
 

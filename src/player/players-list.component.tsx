@@ -1,8 +1,10 @@
 import { Space, Tag } from "antd";
-import { useAppState } from "../app/app-state.context";
+import { useGame } from "../app/app-state.context";
+import { usePlayer } from "./player.context";
 
 export function PlayersList() {
-  const { players, tempVoteResults } = useAppState();
+  const currentPlayer = usePlayer();
+  const { players, tempVoteResults } = useGame();
 
   return (
     <Space>
@@ -10,12 +12,10 @@ export function PlayersList() {
         const vote = (tempVoteResults || {})[player.id];
         return (
           <Tag key={player.id} color={vote ? "green" : "blue"}>
-            {player.name}
+            {player.name} {player.id === currentPlayer?.playerId ? "(you)" : ""}
           </Tag>
         );
       })}
     </Space>
   );
-
-  return;
 }

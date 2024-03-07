@@ -1,7 +1,7 @@
 import { IParticipantOnlineMessage, IPlayerVoteMessage } from '../game/game-message.model';
 import { IGameState } from '../game/game-state.model';
 import { WakuNodeService } from '../waku/waku-node.service';
-import { IPlayer, PlayerName } from './player.model';
+import { IPlayer } from './player.model';
 
 // TODO: is it a good naming?
 export class PlayerEventsService {

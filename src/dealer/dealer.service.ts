@@ -13,7 +13,7 @@ export class DealerService {
 
     this.gameStateSyncService
       .init()
-    //.enableIntervalSync(10000);
+      .enableIntervalSync(10000);
   }
 
   public setVoteItem(item: IVoteItem): void {

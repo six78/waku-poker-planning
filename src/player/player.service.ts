@@ -1,21 +1,24 @@
 import { IGameState } from '../game/game-state.model';
-import { CurrentUserService } from '../user/current-user.service';
 import { WakuNodeService } from '../waku/waku-node.service';
 import { PlayerEventsService } from './player-events.service';
+import { IPlayer, PlayerId, PlayerName } from './player.model';
 
 export class PlayerService {
-  public readonly playerId: string;
+  public readonly playerId: PlayerId;
+  public readonly playerName: PlayerName;
   public readonly isDealer: boolean;
   private readonly events: PlayerEventsService;
-  constructor(node: WakuNodeService, private readonly userService: CurrentUserService) {
+
+  constructor(node: WakuNodeService, player: IPlayer) {
+    this.playerId = player.id;
+    this.playerName = player.name;
+    this.isDealer = player.isDealer;
     this.events = new PlayerEventsService(node);
-    this.playerId = this.userService.id;
-    this.isDealer = userService.isDealer;
   }
 
   public vote(voteFor: string, voteResult: number | null): void {
     this.events.sendVote({
-      voteBy: this.userService.id,
+      voteBy: this.playerId,
       voteFor,
       voteResult
     })
@@ -27,9 +30,10 @@ export class PlayerService {
   }
 
   public enableHeartBeat(): this {
-    const player = {
-      id: this.userService.id,
-      name: this.userService.name
+    const player: IPlayer = {
+      id: this.playerId,
+      name: this.playerName,
+      isDealer: this.isDealer
     }
 
     this.events.playerIsOnline(player);

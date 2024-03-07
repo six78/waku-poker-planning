@@ -1,45 +1,68 @@
-import { useEffect, useState } from "react";
-import { AppStateContext } from "./app/app-state.context";
-import "./App.css";
-import { IGameState } from "./game/game-state.model";
-import { Deck } from "./deck/deck.component";
-import { Header } from "./page-layout/header.component";
-import { usePlayerContext } from "./player/player.context";
-import { appConfig } from "./app/app.config";
-import { DealerControlPanel } from "./dealer/dealer-control-panel.component";
+import { useEffect, useMemo, useState } from "react";
+import { Spin } from "antd";
 
-function App() {
-  const playerService = usePlayerContext()!;
+import { useParams } from "react-router-dom";
+import { getUserDataFromLocalStorage } from "./user/current-user";
+import {
+  WakuNodeService,
+  createWakuNodeService,
+} from "./waku/waku-node.service";
+import { PlayerService } from "./player/player.service";
+import { PlayerContext } from "./player/player.context";
+import { DealerServiceContext } from "./dealer/dealer.context";
+import { DealerService } from "./dealer/dealer.service";
+import { Room } from "./room/room.component";
+import { createContentTopic } from "./app/app.const";
+import { isCurrentUserDealerForRoom } from "./dealer/dealer-resolver";
 
-  const [state, setState] = useState<IGameState>({
-    players: [],
-    voteItem: appConfig.mockedVoteCongif,
-    tempVoteResults: null,
-  });
+export function App() {
+  const { id: roomId } = useParams();
+  const user = useMemo(getUserDataFromLocalStorage, []);
+
+  if (!roomId || !user) {
+    throw new Error(
+      `Cannot initialize app for room ${roomId} and user ${JSON.stringify(
+        user
+      )}`
+    );
+  }
+
+  const isDealer = isCurrentUserDealerForRoom(roomId);
+
+  const [node, setNode] = useState<WakuNodeService | null>(null);
+  const [playerService, setPlayerService] = useState<PlayerService | null>(
+    null
+  );
+  const [dealerService, setDealerService] = useState<DealerService | null>(
+    null
+  );
 
   useEffect(() => {
-    playerService.onStateChanged(setState).enableHeartBeat();
-  }, [playerService]);
+    console.log("USE EFFECT");
 
-  return (
-    <AppStateContext.Provider value={state}>
-      <div className="w-screen h-screen flex">
-        <div className="flex flex-col flex-grow">
-          <div className="h-14 drop-shadow-md">
-            <Header></Header>
-          </div>
-          <div className="flex-grow overflow-auto">
-            <Deck></Deck>
-          </div>
-        </div>
-        {playerService.isDealer && (
-          <div className="w-96 border-l border-gray-300">
-            <DealerControlPanel />
-          </div>
-        )}
-      </div>
-    </AppStateContext.Provider>
+    createWakuNodeService(createContentTopic(roomId)).then((node) => {
+      if (!node) {
+        return;
+      }
+
+      if (isDealer) {
+        setDealerService(new DealerService(node));
+      }
+
+      setPlayerService(new PlayerService(node, user));
+      setNode(node);
+    });
+  }, [roomId, user, isDealer]);
+
+  return node ? (
+    <PlayerContext.Provider value={playerService}>
+      <DealerServiceContext.Provider value={dealerService}>
+        <Room />
+      </DealerServiceContext.Provider>
+    </PlayerContext.Provider>
+  ) : (
+    <div className="h-screen w-screen flex justify-center items-center">
+      <Spin size="large" />
+    </div>
   );
 }
-
-export default App;

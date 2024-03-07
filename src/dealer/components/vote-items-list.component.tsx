@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Progress, Tooltip } from "antd";
 import {
   CheckCircleOutlined,
   DeleteOutlined,
@@ -6,32 +6,46 @@ import {
   QuestionCircleOutlined,
 } from "@ant-design/icons";
 import { IVoteItem } from "../../voting/voting.model";
-import { useDealerContext } from "../dealer.context";
-import { useAppState } from "../../app/app-state.context";
 import Card from "antd/es/card/Card";
 import Meta from "antd/es/card/Meta";
 import { IGameState } from "../../game/game-state.model";
+import { ReactElement } from "react";
+import { useGame } from "../../app/app-state.context";
+import { useDealer } from "../dealer.context";
 
-function getDescription(item: IVoteItem, state: IGameState): string | number {
+function getDescription(item: IVoteItem, state: IGameState): ReactElement {
   const { voteItem: currentVoteItem, players, tempVoteResults } = state;
   const isCurrentVoteItem = currentVoteItem?.id === item.id;
 
   if (isCurrentVoteItem) {
-    return `${Object.keys(tempVoteResults || {}).length} of ${
+    const completedVotesCount = Object.keys(tempVoteResults || {}).length;
+    const totalVotes = players.length;
+
+    const percent = (100 * completedVotesCount) / totalVotes;
+    const text = `${Object.keys(tempVoteResults || {}).length} of ${
       players.length
-    } vote(s)`;
+    } player(s) voted`;
+    return (
+      <Tooltip placement="top" title={text}>
+        <Progress
+          percent={percent}
+          status={percent === 100 ? "success" : "active"}
+          showInfo={false}
+        />
+      </Tooltip>
+    );
   }
 
-  return item.result || "No vote yet";
+  return <>{item.result || "No vote yet"}</>;
 }
 
 export function VoteItemsList(props: {
   issues: IVoteItem[];
   submitVoting: () => void;
 }) {
-  const state = useAppState();
-  const voteItem = state.voteItem;
-  const dealer = useDealerContext();
+  const game = useGame();
+  const voteItem = game.voteItem;
+  const dealer = useDealer();
 
   function startVoting(item: IVoteItem): void {
     dealer?.setVoteItem(item);
@@ -79,7 +93,7 @@ export function VoteItemsList(props: {
                 )}
               </div>
             }
-            description={getDescription(x, state)}
+            description={getDescription(x, game)}
           />
         </Card>
       ))}

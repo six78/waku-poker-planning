@@ -3,4 +3,4 @@ import { PlayerService } from './player.service';
 
 
 export const PlayerContext = createContext<PlayerService | null>(null);
-export const usePlayerContext = () => useContext(PlayerContext);
+export const usePlayer = () => useContext(PlayerContext);
