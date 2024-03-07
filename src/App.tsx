@@ -49,7 +49,7 @@ export function App() {
         setDealerService(new DealerService(node));
       }
 
-      setPlayerService(new PlayerService(node, user));
+      setPlayerService(new PlayerService(node, { ...user, isDealer }));
       setNode(node);
     });
   }, [roomId, user, isDealer]);
