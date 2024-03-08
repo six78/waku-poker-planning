@@ -33,7 +33,12 @@ export async function createWakuNodeService(contentTopic: string): Promise<WakuN
     return new Promise(r => r(new WakuNodeService(new WakuFakeLightNode(), contentTopic)))
   }
 
-  console.log('CREATING NODE...');
+  let step: string = 'CREATING NODE';
+
+  const timeout = setTimeout(() => {
+    console.warn(`Too long waiting for node instance on step ${step}`)
+  }, 8000);
+
   const node = await createLightNode({
     libp2p: {
       peerDiscovery: [
@@ -46,17 +51,15 @@ export async function createWakuNodeService(contentTopic: string): Promise<WakuN
       ],
     },
   });
-  console.log('NODE CREATED, STARTING...');
+  step = 'NODE CREATED, STARTING...'
   await node.start();
-  console.log('NODE STARTED, WAITING FOR PEARS...');
+  step = 'NODE STARTED, WAITING FOR PEARS...';
   await waitForRemotePeer(node, [
     Protocols.LightPush,
     Protocols.Filter,
   ]);
-  console.log('NODE PEERS AWAITED, WAITING FOR SUBSCRIPTION...');
 
-  console.log('NODE IS READY');
-
+  clearTimeout(timeout);
   return new WakuNodeService(node, contentTopic);
 }
 

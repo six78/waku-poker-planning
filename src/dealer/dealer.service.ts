@@ -23,4 +23,8 @@ export class DealerService {
   public endVoting(): void {
     this.gameStateSyncService.endVoting();
   }
+
+  public revote(): void {
+    this.gameStateSyncService.revote();
+  }
 }

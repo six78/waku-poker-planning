@@ -6,6 +6,10 @@ import { IPlayer, PlayerId, PlayerName } from './player.model';
 export class PlayerService {
   public readonly playerId: PlayerId;
   public readonly playerName: PlayerName;
+  /**
+   * @deprecated
+   * TODO: remove isDealer and call useDealer() instead
+   */
   public readonly isDealer: boolean;
   private readonly events: PlayerEventsService;
 

@@ -38,8 +38,6 @@ export function App() {
   );
 
   useEffect(() => {
-    console.log("USE EFFECT");
-
     createWakuNodeService(createContentTopic(roomId)).then((node) => {
       if (!node) {
         return;

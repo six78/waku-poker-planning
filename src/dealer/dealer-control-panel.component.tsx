@@ -5,7 +5,9 @@ import { VoteItemsList } from "./components/vote-items-list.component";
 import { IVoteItem } from "../voting/voting.model";
 import { useGame } from "../app/app-state.context";
 
-export function DealerControlPanel() {
+export function DealerControlPanel(props: {
+  revealVotes: (voteItem: IVoteItem) => void;
+}) {
   const dealer = useDealer();
   const game = useGame();
   const [voteItems, setVoteItems] = useState<IVoteItem[]>([]);
@@ -14,6 +16,9 @@ export function DealerControlPanel() {
     if (!game.voteItem) {
       return;
     }
+
+    props.revealVotes(game.voteItem);
+    return;
 
     dealer.endVoting();
 

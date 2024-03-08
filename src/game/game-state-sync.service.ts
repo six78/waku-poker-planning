@@ -42,6 +42,11 @@ export class GameStateSyncService {
     this.sendStateToNetwork();
   }
 
+  public revote(): void {
+    this.state.tempVoteResults = null;
+    this.sendStateToNetwork();
+  }
+
   public enableIntervalSync(timeout: number): this {
     setInterval(() => this.sendStateToNetwork(), timeout);
     return this

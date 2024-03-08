@@ -1,3 +1,125 @@
-export function VoteResult() {
-  return <h3>lalala</h3>;
+import { Button, Modal, Space } from "antd";
+import { useGame } from "../app/app-state.context";
+import { IPlayer, PlayerId, PlayerName } from "../player/player.model";
+import { PlayerTag } from "../player/players-list.component";
+import { generateHash } from "../shared/random-hash";
+import { VoteOption } from "./vote-option.component";
+import { IVoteResult, NO_VOTE_LABEL, VoteValue } from "./voting.model";
+import { useState } from "react";
+import { usePlayer } from "../player/player.context";
+import { useDealer } from "../dealer/dealer.context";
+
+function calculateResults(
+  players: IPlayer[],
+  votes: { [key: PlayerId]: VoteValue }
+): IVoteResult {
+  return players.reduce((result: IVoteResult, player) => {
+    const vote = votes[player.id] || NO_VOTE_LABEL;
+    if (!result[vote]) {
+      result[vote] = [];
+    }
+    result[vote]!.push(player.name);
+    return result;
+  }, {} as IVoteResult);
+}
+
+function calculateResultsMocked(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _players: IPlayer[],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _votes: { [key: PlayerId]: VoteValue }
+): IVoteResult {
+  return {
+    "8": [
+      generateHash() + generateHash(),
+      generateHash() + generateHash() + generateHash(),
+      generateHash() + generateHash() + generateHash(),
+      generateHash() + generateHash() + generateHash(),
+      generateHash() + generateHash() + generateHash(),
+      generateHash() + generateHash() + generateHash(),
+      generateHash() + generateHash() + generateHash(),
+      generateHash(),
+      generateHash(),
+      generateHash(),
+      generateHash(),
+      generateHash(),
+      generateHash(),
+      generateHash(),
+      generateHash(),
+      generateHash(),
+      generateHash(),
+    ],
+    "13": ["dsfgsdfg", "alsdsa", "asdasd", "sdasdasd"],
+    [NO_VOTE_LABEL]: ["sdfgsdfg"],
+  };
+}
+
+export function VoteResult(props: { onRevote: () => void }) {
+  const { players, tempVoteResults } = useGame();
+  const [result, setResult] = useState<VoteValue | null>(null);
+  const dealer = useDealer();
+
+  if (!tempVoteResults) {
+    // TODO:
+    throw new Error("");
+  }
+
+  function handleVoteClick(vote: VoteValue): void {
+    if (!dealer || vote === NO_VOTE_LABEL) {
+      return;
+    }
+
+    setResult(result !== vote ? vote : null);
+  }
+
+  function handleRevoteClick(): void {
+    props.onRevote();
+  }
+
+  const votes = calculateResultsMocked(players, tempVoteResults);
+  console.log(votes);
+
+  return (
+    <Modal
+      title="Vote results"
+      open={true}
+      closable={false}
+      footer={
+        <Space>
+          {dealer && <Button onClick={handleRevoteClick}>Revote</Button>}
+          <Button type="primary" disabled={!result}>
+            Submit
+          </Button>
+        </Space>
+      }
+    >
+      {Object.entries(votes).map((entry) => {
+        const vote = entry[0] as VoteValue;
+        const players = entry[1] as PlayerName[];
+
+        return (
+          <div key={vote} className="flex items-center mb-4">
+            <VoteOption
+              className="flex-shrink-0"
+              active={vote === result}
+              key={vote}
+              onClick={handleVoteClick.bind(undefined, vote)}
+              showLoader={false}
+            >
+              {vote}
+            </VoteOption>
+            <div className="ml-4">
+              <Space wrap={true}>
+                {players.map((player) => (
+                  <PlayerTag key={player} color="blue">
+                    {player}
+                  </PlayerTag>
+                ))}
+              </Space>
+            </div>
+          </div>
+        );
+      })}
+    </Modal>
+  );
 }

@@ -5,9 +5,14 @@ import { usePlayer } from "../player/player.context";
 import { useEffect, useState } from "react";
 import { IGameState } from "../game/game-state.model";
 import { DealerControlPanel } from "../dealer/dealer-control-panel.component";
+import { VoteResult } from "../voting/vote-result.component";
+import { useDealer } from "../dealer/dealer.context";
+import { IVoteItem } from "../voting/voting.model";
 
 export function Room() {
   const player = usePlayer()!;
+  const dealer = useDealer()!;
+  const [revealVotes, setRevealVotes] = useState(false);
 
   const [state, setState] = useState<IGameState>({
     players: [],
@@ -18,6 +23,19 @@ export function Room() {
   useEffect(() => {
     player.onStateChanged(setState).enableHeartBeat();
   }, [player]);
+
+  function onRevote() {
+    setRevealVotes(false);
+    dealer.revote();
+  }
+
+  function reveal(voteItem: IVoteItem): void {
+    if (voteItem.id !== state.voteItem?.id) {
+      return;
+    }
+
+    setRevealVotes(true);
+  }
 
   return (
     <GameStateContext.Provider value={state}>
@@ -32,10 +50,12 @@ export function Room() {
         </div>
         {player.isDealer && (
           <div className="w-96 border-l border-gray-300">
-            <DealerControlPanel />
+            <DealerControlPanel revealVotes={reveal} />
           </div>
         )}
       </div>
+
+      {revealVotes && <VoteResult onRevote={onRevote}></VoteResult>}
     </GameStateContext.Provider>
   );
 }

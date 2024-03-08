@@ -1,8 +1,22 @@
 import { Space, Tag } from "antd";
 import { useGame } from "../app/app-state.context";
 import { usePlayer } from "./player.context";
+import { ReactNode } from "react";
+
+export function PlayerTag(props: {
+  children: ReactNode;
+  color: "green" | "blue";
+  isCurrentPlayer?: boolean;
+}) {
+  return (
+    <Tag color={props.color}>
+      {props.children} {props.isCurrentPlayer ? "(you)" : ""}
+    </Tag>
+  );
+}
 
 export function PlayersList() {
+  // TODO: to pure component
   const currentPlayer = usePlayer();
   const { players, tempVoteResults } = useGame();
 
@@ -11,9 +25,13 @@ export function PlayersList() {
       {players.map((player) => {
         const vote = (tempVoteResults || {})[player.id];
         return (
-          <Tag key={player.id} color={vote ? "green" : "blue"}>
-            {player.name} {player.id === currentPlayer?.playerId ? "(you)" : ""}
-          </Tag>
+          <PlayerTag
+            key={player.id}
+            color={vote ? "green" : "blue"}
+            isCurrentPlayer={player.id === currentPlayer?.playerId}
+          >
+            {player.name}
+          </PlayerTag>
         );
       })}
     </Space>

@@ -1,10 +1,10 @@
-import { IPlayer } from '../player/player.model';
-import { IVoteItem } from '../voting/voting.model';
+import { IPlayer, PlayerId } from '../player/player.model';
+import { IVoteItem, VoteValue } from '../voting/voting.model';
 
 export interface IGameState {
   players: IPlayer[];
   voteItem: IVoteItem | null;
-  tempVoteResults: { [key: string]: number } | null
+  tempVoteResults: { [key: PlayerId]: VoteValue } | null;
 }
 
 

@@ -1,4 +1,12 @@
-import { PlayerId } from '../player/player.model';
+import { PlayerId, PlayerName } from '../player/player.model';
+
+export const NO_VOTE_LABEL = 'No vote';
+export type VoteValue = number;
+
+export interface IVoteResult {
+  [NO_VOTE_LABEL]?: PlayerName[];
+  [key: VoteValue]: PlayerName[];
+}
 
 export interface IVoteItem {
   id: string;

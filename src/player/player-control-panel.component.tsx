@@ -1,64 +1,108 @@
-import { Card, Spin } from "antd";
-import { ReactNode, useState } from "react";
+import { Card } from "antd";
+import { useEffect, useRef, useState } from "react";
 import { usePlayer } from "./player.context";
 import { useGame } from "../app/app-state.context";
+import { getFibonacciValues } from "../voting/strategy/fibonacci-strategy";
+import { VoteOption } from "../voting/vote-option.component";
+import { VoteValue } from "../voting/voting.model";
+import useMessage from "antd/es/message/useMessage";
+import { appConfig } from "../app/app.config";
 
-const votes = [1, 2, 3, 5, 8, 13, 21, 34, 50];
-
-function VoteOption(props: {
-  children: ReactNode;
-  onClick: () => void;
-  showLoader: boolean;
-  active: boolean;
-}) {
-  return (
-    <div
-      onClick={props.onClick}
-      className={`w-12 h-16 rounded-md border border-sky-700 flex items-center justify-center cursor-pointer relative ${
-        props.active ? "bg-sky-400" : ""
-      }`}
-    >
-      {props.showLoader && (
-        <div className="absolute w-full h-full flex-center bg-sky-100 rounded-md">
-          <Spin></Spin>
-        </div>
-      )}
-
-      {props.children}
-    </div>
-  );
-}
+const TIMEOUT = 10000;
 
 export function PlayerControlPanel() {
-  const { voteItem, tempVoteResults } = useGame();
-  const playerService = usePlayer()!;
-  const statePlayerVote = (tempVoteResults || {})[playerService.playerId];
-  const [lastPlayerVote, setLastPlayerVote] = useState<number | null>(null);
+  const [messageApi, contextHolder] = useMessage();
+  const player = usePlayer()!;
 
-  function handleClick(value: number): void {
-    const isClickOnTheActiveVoteCard =
-      value === statePlayerVote && statePlayerVote === lastPlayerVote;
-    const vote = isClickOnTheActiveVoteCard ? null : value;
+  const { voteItem: issue, tempVoteResults } = useGame();
 
-    playerService.vote(voteItem!.id, vote);
-    setLastPlayerVote(vote);
+  // Player vote stored in the game state
+  const appliedVote = (tempVoteResults || {})[player.playerId];
+  // Player vote on player's device that didn't reach the game state
+  const [pendingVote, setPendingVote] = useState<VoteValue | null>(null);
+  const [revokedVote, setRevokedVote] = useState<VoteValue | null>(null);
+
+  const timeoutId = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      console.warn("RESETING TIMER");
+      clearTimeoutIfExists();
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log("VOTE APPLIED", appliedVote);
+    console.log("PENDING VOTE:", pendingVote);
+    console.log("REVOKED VOTE:", revokedVote);
+
+    if (revokedVote) {
+      if (!appliedVote) {
+        setPendingVote(null);
+        setRevokedVote(null);
+      }
+
+      return;
+    }
+
+    if (appliedVote === pendingVote) {
+      setPendingVote(null);
+    }
+  }, [appliedVote, pendingVote, revokedVote]);
+
+  function submitVote(value: VoteValue): void {
+    setRevokedVote(null);
+    setPendingVote(value);
+    sendVote(value);
+  }
+
+  function revokeVote(value: VoteValue): void {
+    setRevokedVote(value);
+    setPendingVote(value);
+    sendVote(null);
+  }
+
+  function sendVote(value: VoteValue | null): void {
+    player.vote(issue!.id, value);
+    clearTimeoutIfExists();
+    timeoutId.current = setTimeout(() => {
+      messageApi.error(
+        `Vote was not applied for ${TIMEOUT} ms, Please revote`,
+        appConfig.messageTimeout
+      );
+      setRevokedVote(null);
+      setPendingVote(null);
+    }, TIMEOUT);
+  }
+
+  function handleClick(value: VoteValue): void {
+    if (pendingVote) {
+      // There are many problems with event races
+      return;
+    }
+
+    const isRevoking = value === appliedVote;
+    isRevoking ? revokeVote(value) : submitVote(value);
+  }
+
+  function clearTimeoutIfExists(): void {
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
   }
 
   return (
     <Card>
-      {voteItem && (
+      {contextHolder}
+      {issue && (
         <div>
           <div className="grid grid-cols-12">
-            {votes.map((x) => (
+            {getFibonacciValues().map((x) => (
               <VoteOption
                 onClick={handleClick.bind(undefined, x)}
                 key={x}
-                showLoader={
-                  x === lastPlayerVote && lastPlayerVote !== statePlayerVote
-                }
-                active={
-                  statePlayerVote === lastPlayerVote && x === statePlayerVote
-                }
+                showLoader={x === pendingVote}
+                active={x === appliedVote}
               >
                 {x}
               </VoteOption>
