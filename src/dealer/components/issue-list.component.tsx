@@ -15,12 +15,12 @@ import { IIssue } from "../../issue/issue.model";
 import { IVotingState } from "../../voting/voting.model";
 
 function getDescription(
-  item: IIssue,
-  state: IVotingState,
+  issue: IIssue,
+  voting: IVotingState,
   players: IPlayer[]
 ): ReactElement {
-  const { issue: currentVoteItem, results: tempVoteResults } = state;
-  const isCurrentVoteItem = currentVoteItem?.id === item.id;
+  const { issue: currentVoteItem, results: tempVoteResults } = voting;
+  const isCurrentVoteItem = currentVoteItem?.id === issue.id;
 
   if (isCurrentVoteItem) {
     const completedVotesCount = Object.keys(tempVoteResults || {}).length;
@@ -41,7 +41,7 @@ function getDescription(
     );
   }
 
-  return <>{item.result || "No vote yet"}</>;
+  return <>{issue.result || "No vote yet"}</>;
 }
 
 export function IssueList(props: { issues: IIssue[]; reveal: () => void }) {

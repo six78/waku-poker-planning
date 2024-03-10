@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { DealerControlPanel } from "../dealer/dealer-control-panel.component";
 import { VoteResult } from "../voting/vote-result.component";
 import { useDealer } from "../dealer/dealer.context";
-import { useOnlinePlayersList, useVoting } from "../app/app.state";
+import { useIssues, useOnlinePlayersList, useVoting } from "../app/app.state";
 import { IIssue } from "../issue/issue.model";
 import { VoteValue } from "../voting/voting.model";
 
@@ -13,9 +13,9 @@ export function Room() {
   const player = usePlayer()!;
   const dealer = useDealer()!;
   const [revealVotes, setRevealVotes] = useState(false);
-
   const [players, setPlayers] = useOnlinePlayersList();
   const [voting, setVoting] = useVoting();
+  const [issues, setIssues] = useIssues();
 
   useEffect(() => {
     player
@@ -45,7 +45,19 @@ export function Room() {
 
   function submit(result: VoteValue): void {
     setRevealVotes(false);
-    console.log(result);
+    dealer.endVoting();
+    setIssues(
+      issues.map((x) => {
+        if (x.id === voting.issue?.id) {
+          return {
+            ...x,
+            result: `${result}`,
+          };
+        }
+
+        return x;
+      })
+    );
   }
 
   return (

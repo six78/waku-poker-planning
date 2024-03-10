@@ -1,14 +1,13 @@
-import { useState } from "react";
 import { AddIssue } from "./components/add-issue.component";
 import { IssueList } from "./components/issue-list.component";
 import { IIssue } from "../issue/issue.model";
-import { useVoting } from "../app/app.state";
+import { useIssues, useVoting } from "../app/app.state";
 
 export function DealerControlPanel(props: {
   revealVotes: (voteItem: IIssue) => void;
 }) {
   const [voting] = useVoting();
-  const [issues, setIssues] = useState<IIssue[]>([]);
+  const [issues, setIssues] = useIssues();
 
   function submitVoting(): void {
     if (!voting.issue) {
@@ -16,21 +15,6 @@ export function DealerControlPanel(props: {
     }
 
     props.revealVotes(voting.issue);
-    return;
-
-    // dealer.endVoting();
-
-    // // TODO: calculate results
-    // setVoteItems(
-    //   voteItems.map((x) => {
-    //     if (x.id === game.voteItem!.id) {
-    //       x.result = 8;
-    //       x.voteHistory = game.tempVoteResults || {};
-    //     }
-
-    //     return x;
-    //   })
-    // );
   }
 
   return (
