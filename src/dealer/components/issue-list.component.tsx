@@ -1,4 +1,4 @@
-import { Button, Progress, Space, Tooltip } from "antd";
+import { Button, Empty, Progress, Space, Tooltip } from "antd";
 import {
   CheckCircleOutlined,
   DeleteOutlined,
@@ -52,6 +52,17 @@ export function IssueList(props: { issues: IIssue[]; reveal: () => void }) {
 
   function startVoting(item: IIssue): void {
     dealer?.startVoting(item);
+  }
+
+  if (!props.issues.length) {
+    return (
+      <div className="flex-grow flex-center">
+        <Empty
+          description="No issue to vote"
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        />
+      </div>
+    );
   }
 
   return (

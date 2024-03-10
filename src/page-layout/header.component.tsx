@@ -14,7 +14,7 @@ export function Header() {
   }
 
   return (
-    <div className="w-full h-full px-4 bg-white flex items-center justify-end">
+    <div className="w-full h-full px-6 bg-white flex items-center justify-end">
       {contextHolder}
       <Space>
         <Button onClick={() => copyToClipboard(roomId!)}>Copy room hash</Button>

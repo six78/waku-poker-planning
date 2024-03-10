@@ -63,8 +63,8 @@ export function Room() {
   return (
     <>
       <div className="w-screen h-screen flex">
-        <div className="flex flex-col flex-grow">
-          <div className="h-14 drop-shadow-md">
+        <div className="flex flex-col overflow-hidden flex-grow">
+          <div className="h-14 drop-shadow-md flex-shrink-0">
             <Header></Header>
           </div>
           <div className="flex-grow overflow-auto">
