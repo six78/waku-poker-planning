@@ -2,8 +2,8 @@ import Title from "antd/es/typography/Title";
 import { PlayerControlPanel } from "../player/player-control-panel.component";
 import Markdown from "react-markdown";
 import { PlayersList } from "../player/players-list.component";
-import { useGame } from "../app/app-state.context";
 import { IIssue } from "../issue/issue.model";
+import { useVoting } from "../app/app.state";
 
 function NoVoteItem() {
   return (
@@ -29,13 +29,16 @@ function IssueVoteComponent(props: { item: IIssue }) {
 }
 
 export function Deck() {
-  const game = useGame();
-  const voteItem = game.issue;
+  const [voting] = useVoting();
 
   return (
     <div className="bg-white text-gray-900 h-full w-full p-6">
       <div className="h-full w-full">
-        {voteItem ? <IssueVoteComponent item={voteItem} /> : <NoVoteItem />}
+        {voting.issue ? (
+          <IssueVoteComponent item={voting.issue} />
+        ) : (
+          <NoVoteItem />
+        )}
       </div>
     </div>
   );

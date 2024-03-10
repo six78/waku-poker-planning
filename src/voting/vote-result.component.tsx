@@ -1,5 +1,4 @@
 import { Button, Modal, Space } from "antd";
-import { useGame } from "../app/app-state.context";
 import { IPlayer, PlayerId, PlayerName } from "../player/player.model";
 import { PlayerTag } from "../player/players-list.component";
 import { generateHash } from "../shared/random-hash";
@@ -12,7 +11,10 @@ import {
 } from "./voting.model";
 import { useState } from "react";
 import { useDealer } from "../dealer/dealer.context";
-import { useOnlinePlayersList as useOnlinePlayersList } from "../game/game.state";
+import {
+  useOnlinePlayersList as useOnlinePlayersList,
+  useVoting,
+} from "../app/app.state";
 
 const MOCK = true;
 
@@ -67,11 +69,12 @@ function calculateResultsMocked(
 
 export function VoteResult(props: { onRevote: () => void }) {
   const [players] = useOnlinePlayersList();
-  const { results: tempVoteResults } = useGame();
+  const [voting] = useVoting();
+  const results = voting.results;
   const [result, setResult] = useState<VoteValue | null>(null);
   const dealer = useDealer();
 
-  if (!tempVoteResults) {
+  if (!results) {
     // TODO:
     throw new Error("");
   }
@@ -88,7 +91,7 @@ export function VoteResult(props: { onRevote: () => void }) {
     props.onRevote();
   }
 
-  const votes = calculateResults(players, tempVoteResults);
+  const votes = calculateResults(players, results);
   console.log(votes);
 
   return (

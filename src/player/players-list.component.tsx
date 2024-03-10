@@ -1,8 +1,7 @@
 import { Space, Tag } from "antd";
-import { useGame } from "../app/app-state.context";
 import { usePlayer } from "./player.context";
 import { ReactNode } from "react";
-import { useOnlinePlayersList } from "../game/game.state";
+import { useOnlinePlayersList, useVoting } from "../app/app.state";
 
 export function PlayerTag(props: {
   children: ReactNode;
@@ -19,13 +18,13 @@ export function PlayerTag(props: {
 export function PlayersList() {
   // TODO: to pure component
   const currentPlayer = usePlayer();
-  const { results: tempVoteResults } = useGame();
+  const [voting] = useVoting();
   const [players] = useOnlinePlayersList();
 
   return (
     <Space>
       {players.map((player) => {
-        const vote = (tempVoteResults || {})[player.id];
+        const vote = (voting.results || {})[player.id];
         return (
           <PlayerTag
             key={player.id}

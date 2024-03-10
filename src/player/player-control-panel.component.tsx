@@ -1,23 +1,22 @@
 import { Card } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { usePlayer } from "./player.context";
-import { useGame } from "../app/app-state.context";
 import { getFibonacciValues } from "../voting/strategy/fibonacci-strategy";
 import { VoteOption } from "../voting/vote-option.component";
 import { VoteValue } from "../voting/voting.model";
 import useMessage from "antd/es/message/useMessage";
 import { appConfig } from "../app/app.config";
+import { useVoting } from "../app/app.state";
 
 const TIMEOUT = 10000;
 
 export function PlayerControlPanel() {
   const [messageApi, contextHolder] = useMessage();
   const player = usePlayer()!;
-
-  const { issue: issue, results: tempVoteResults } = useGame();
+  const [voting] = useVoting();
 
   // Player vote stored in the game state
-  const appliedVote = (tempVoteResults || {})[player.playerId];
+  const appliedVote = (voting.results || {})[player.playerId];
   // Player vote on player's device that didn't reach the game state
   const [pendingVote, setPendingVote] = useState<VoteValue | null>(null);
   const [revokedVote, setRevokedVote] = useState<VoteValue | null>(null);
@@ -59,7 +58,7 @@ export function PlayerControlPanel() {
   }
 
   function sendVote(value: VoteValue | null): void {
-    player.vote(issue!.id, value);
+    player.vote(voting.issue!.id, value);
     clearTimeoutIfExists();
     timeoutId.current = setTimeout(() => {
       messageApi.error(
@@ -90,7 +89,7 @@ export function PlayerControlPanel() {
   return (
     <Card>
       {contextHolder}
-      {issue && (
+      {voting.issue && (
         <div>
           <div className="grid grid-cols-12">
             {getFibonacciValues().map((x) => (

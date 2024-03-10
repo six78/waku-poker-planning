@@ -8,10 +8,9 @@ import {
 import Card from "antd/es/card/Card";
 import Meta from "antd/es/card/Meta";
 import { ReactElement } from "react";
-import { useGame } from "../../app/app-state.context";
 import { useDealer } from "../dealer.context";
 import { IPlayer } from "../../player/player.model";
-import { useOnlinePlayersList } from "../../game/game.state";
+import { useOnlinePlayersList, useVoting } from "../../app/app.state";
 import { IIssue } from "../../issue/issue.model";
 import { IVotingState } from "../../voting/voting.model";
 
@@ -45,13 +44,13 @@ function getDescription(
   return <>{item.result || "No vote yet"}</>;
 }
 
-export function VoteItemsList(props: {
+export function IssueList(props: {
   issues: IIssue[];
   submitVoting: () => void;
 }) {
   const [players] = useOnlinePlayersList();
-  const game = useGame();
-  const voteItem = game.issue;
+  const [game] = useVoting();
+  const issue = game.issue;
   const dealer = useDealer();
 
   function startVoting(item: IIssue): void {
@@ -66,7 +65,7 @@ export function VoteItemsList(props: {
           actions={[
             <DeleteOutlined key="setting" />,
             <>
-              {voteItem?.id === x.id ? (
+              {issue?.id === x.id ? (
                 <Button onClick={props.submitVoting} type="primary" key="edit">
                   End voting
                 </Button>

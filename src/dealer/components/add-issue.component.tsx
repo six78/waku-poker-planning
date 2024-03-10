@@ -5,7 +5,7 @@ import { IIssue } from "../../issue/issue.model";
 
 const parser = new IssueParsingService();
 
-export function AddVoteItem(props: { addIssue: (issue: IIssue) => void }) {
+export function AddIssue(props: { addIssue: (issue: IIssue) => void }) {
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
 

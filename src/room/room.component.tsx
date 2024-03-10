@@ -1,4 +1,3 @@
-import { GameStateContext } from "../app/app-state.context";
 import { Header } from "../page-layout/header.component";
 import { Deck } from "../deck/deck.component";
 import { usePlayer } from "../player/player.context";
@@ -6,8 +5,7 @@ import { useEffect, useState } from "react";
 import { DealerControlPanel } from "../dealer/dealer-control-panel.component";
 import { VoteResult } from "../voting/vote-result.component";
 import { useDealer } from "../dealer/dealer.context";
-import { useOnlinePlayersList } from "../game/game.state";
-import { IVotingState } from "../voting/voting.model";
+import { useOnlinePlayersList, useVoting } from "../app/app.state";
 import { IIssue } from "../issue/issue.model";
 
 export function Room() {
@@ -16,15 +14,11 @@ export function Room() {
   const [revealVotes, setRevealVotes] = useState(false);
 
   const [players, setPlayers] = useOnlinePlayersList();
-
-  const [state, setState] = useState<IVotingState>({
-    issue: null,
-    results: null,
-  });
+  const [voting, setVoting] = useVoting();
 
   useEffect(() => {
     player
-      .onStateChanged(setState)
+      .onStateChanged(setVoting)
       .enableHeartBeat()
       .onPlayerOnline((player) => {
         if (players.some((participant) => participant.id === player.id)) {
@@ -40,8 +34,8 @@ export function Room() {
     dealer.revote();
   }
 
-  function reveal(voteItem: IIssue): void {
-    if (voteItem.id !== state.issue?.id) {
+  function reveal(issue: IIssue): void {
+    if (issue.id !== voting.issue?.id) {
       return;
     }
 
@@ -49,7 +43,7 @@ export function Room() {
   }
 
   return (
-    <GameStateContext.Provider value={state}>
+    <>
       <div className="w-screen h-screen flex">
         <div className="flex flex-col flex-grow">
           <div className="h-14 drop-shadow-md">
@@ -67,6 +61,6 @@ export function Room() {
       </div>
 
       {revealVotes && <VoteResult onRevote={onRevote}></VoteResult>}
-    </GameStateContext.Provider>
+    </>
   );
 }

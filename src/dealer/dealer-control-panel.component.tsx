@@ -1,21 +1,21 @@
 import { useState } from "react";
-import { AddVoteItem } from "./components/add-vote-item.component";
-import { VoteItemsList } from "./components/vote-items-list.component";
-import { useGame } from "../app/app-state.context";
+import { AddIssue } from "./components/add-issue.component";
+import { IssueList } from "./components/issue-list.component";
 import { IIssue } from "../issue/issue.model";
+import { useVoting } from "../app/app.state";
 
 export function DealerControlPanel(props: {
   revealVotes: (voteItem: IIssue) => void;
 }) {
-  const game = useGame();
-  const [voteItems, setVoteItems] = useState<IIssue[]>([]);
+  const [voting] = useVoting();
+  const [issues, setIssues] = useState<IIssue[]>([]);
 
   function submitVoting(): void {
-    if (!game.issue) {
+    if (!voting.issue) {
       return;
     }
 
-    props.revealVotes(game.issue);
+    props.revealVotes(voting.issue);
     return;
 
     // dealer.endVoting();
@@ -35,12 +35,9 @@ export function DealerControlPanel(props: {
 
   return (
     <div className="w-full h-full bg-white p-6 flex flex-col">
-      <AddVoteItem addIssue={(issue) => setVoteItems([...voteItems, issue])} />
+      <AddIssue addIssue={(issue) => setIssues([...issues, issue])} />
       <div className="overflow-auto">
-        <VoteItemsList
-          issues={voteItems}
-          submitVoting={submitVoting}
-        ></VoteItemsList>
+        <IssueList issues={issues} submitVoting={submitVoting}></IssueList>
       </div>
     </div>
   );
