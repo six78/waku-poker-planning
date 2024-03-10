@@ -19,3 +19,10 @@ const voting = atom<IVotingState>({
 
 export const useVoting = () => useRecoilState(voting);
 
+// const issuesList = atom<IVotingState>({
+//   key: 'issueToVote',
+//   default: {
+//     issue: null,
+//     results: {}
+//   }
+// })

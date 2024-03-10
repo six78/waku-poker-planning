@@ -67,7 +67,10 @@ function calculateResultsMocked(
   };
 }
 
-export function VoteResult(props: { onRevote: () => void }) {
+export function VoteResult(props: {
+  revote: () => void;
+  submit: (value: VoteValue) => void;
+}) {
   const [players] = useOnlinePlayersList();
   const [voting] = useVoting();
   const results = voting.results;
@@ -88,7 +91,7 @@ export function VoteResult(props: { onRevote: () => void }) {
   }
 
   function handleRevoteClick(): void {
-    props.onRevote();
+    props.revote();
   }
 
   const votes = calculateResults(players, results);
@@ -102,7 +105,11 @@ export function VoteResult(props: { onRevote: () => void }) {
       footer={
         <Space>
           {dealer && <Button onClick={handleRevoteClick}>Revote</Button>}
-          <Button type="primary" disabled={!result}>
+          <Button
+            type="primary"
+            disabled={!result}
+            onClick={() => props.submit(result!)}
+          >
             Submit
           </Button>
         </Space>

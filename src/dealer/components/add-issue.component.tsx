@@ -1,9 +1,7 @@
 import { Button, Input } from "antd";
-import { IssueParsingService } from "../../issue/issue.service";
 import { useState } from "react";
 import { IIssue } from "../../issue/issue.model";
-
-const parser = new IssueParsingService();
+import { createIssueFromString } from "../../issue/issue-parsing.service";
 
 export function AddIssue(props: { addIssue: (issue: IIssue) => void }) {
   const [value, setValue] = useState("");
@@ -17,8 +15,13 @@ export function AddIssue(props: { addIssue: (issue: IIssue) => void }) {
 
   function onAdd(): void {
     setLoading(true);
-    parser.createIssueFromString(value).then((x) => {
-      console.log(x);
+    const issueName = value.trim();
+
+    if (!issueName) {
+      return;
+    }
+
+    createIssueFromString(issueName).then((x) => {
       setLoading(false);
       setValue("");
       props.addIssue(x);

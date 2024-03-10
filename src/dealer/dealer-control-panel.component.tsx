@@ -37,7 +37,7 @@ export function DealerControlPanel(props: {
     <div className="w-full h-full bg-white p-6 flex flex-col">
       <AddIssue addIssue={(issue) => setIssues([...issues, issue])} />
       <div className="overflow-auto">
-        <IssueList issues={issues} submitVoting={submitVoting}></IssueList>
+        <IssueList issues={issues} reveal={submitVoting}></IssueList>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import { VoteResult } from "../voting/vote-result.component";
 import { useDealer } from "../dealer/dealer.context";
 import { useOnlinePlayersList, useVoting } from "../app/app.state";
 import { IIssue } from "../issue/issue.model";
+import { VoteValue } from "../voting/voting.model";
 
 export function Room() {
   const player = usePlayer()!;
@@ -29,7 +30,7 @@ export function Room() {
       });
   }, [player]);
 
-  function onRevote() {
+  function revote() {
     setRevealVotes(false);
     dealer.revote();
   }
@@ -40,6 +41,11 @@ export function Room() {
     }
 
     setRevealVotes(true);
+  }
+
+  function submit(result: VoteValue): void {
+    setRevealVotes(false);
+    console.log(result);
   }
 
   return (
@@ -60,7 +66,7 @@ export function Room() {
         )}
       </div>
 
-      {revealVotes && <VoteResult onRevote={onRevote}></VoteResult>}
+      {revealVotes && <VoteResult revote={revote} submit={submit}></VoteResult>}
     </>
   );
 }

@@ -44,10 +44,7 @@ function getDescription(
   return <>{item.result || "No vote yet"}</>;
 }
 
-export function IssueList(props: {
-  issues: IIssue[];
-  submitVoting: () => void;
-}) {
+export function IssueList(props: { issues: IIssue[]; reveal: () => void }) {
   const [players] = useOnlinePlayersList();
   const [game] = useVoting();
   const issue = game.issue;
@@ -66,7 +63,7 @@ export function IssueList(props: {
             <DeleteOutlined key="setting" />,
             <>
               {issue?.id === x.id ? (
-                <Button onClick={props.submitVoting} type="primary" key="edit">
+                <Button onClick={props.reveal} type="primary" key="edit">
                   End voting
                 </Button>
               ) : (
