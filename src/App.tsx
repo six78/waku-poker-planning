@@ -14,6 +14,7 @@ import { DealerService } from "./dealer/dealer.service";
 import { Room } from "./room/room.component";
 import { createContentTopic } from "./app/app.const";
 import { isCurrentUserDealerForRoom } from "./dealer/dealer-resolver";
+import { RecoilRoot } from "recoil";
 
 export function App() {
   const { id: roomId } = useParams();
@@ -50,11 +51,13 @@ export function App() {
   }, [roomId, user, isDealer]);
 
   return node ? (
-    <PlayerContext.Provider value={playerService}>
-      <DealerServiceContext.Provider value={dealerService}>
-        <Room />
-      </DealerServiceContext.Provider>
-    </PlayerContext.Provider>
+    <RecoilRoot>
+      <PlayerContext.Provider value={playerService}>
+        <DealerServiceContext.Provider value={dealerService}>
+          <Room />
+        </DealerServiceContext.Provider>
+      </PlayerContext.Provider>
+    </RecoilRoot>
   ) : (
     <div className="h-screen w-screen flex justify-center items-center">
       <Spin size="large" />

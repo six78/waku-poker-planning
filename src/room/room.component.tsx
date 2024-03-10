@@ -8,33 +8,30 @@ import { DealerControlPanel } from "../dealer/dealer-control-panel.component";
 import { VoteResult } from "../voting/vote-result.component";
 import { useDealer } from "../dealer/dealer.context";
 import { IVoteItem } from "../voting/voting.model";
+import { useOnlinePlayersList } from "../game/game.state";
 
 export function Room() {
   const player = usePlayer()!;
   const dealer = useDealer()!;
   const [revealVotes, setRevealVotes] = useState(false);
 
+  const [players, setPlayers] = useOnlinePlayersList();
+
   const [state, setState] = useState<IGameState>({
-    players: [],
     voteItem: null,
     tempVoteResults: null,
   });
 
   useEffect(() => {
     player
-      .onStateChanged((newState) => {
-        setState({
-          ...newState,
-          players: state.players,
-        });
-      })
+      .onStateChanged(setState)
       .enableHeartBeat()
       .onPlayerOnline((player) => {
-        if (state.players.some((participant) => participant.id === player.id)) {
+        if (players.some((participant) => participant.id === player.id)) {
           return;
         }
 
-        setState({ ...state, players: [...state.players, player] });
+        setPlayers([...players, player]);
       });
   }, [player]);
 

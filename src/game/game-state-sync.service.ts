@@ -5,7 +5,6 @@ import { IVoteItem } from '../voting/voting.model';
 
 export class GameStateSyncService {
   private state: IGameState = {
-    players: [],
     voteItem: null,
     tempVoteResults: null
   }

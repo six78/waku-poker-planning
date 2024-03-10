@@ -2,6 +2,7 @@ import { Space, Tag } from "antd";
 import { useGame } from "../app/app-state.context";
 import { usePlayer } from "./player.context";
 import { ReactNode } from "react";
+import { useOnlinePlayersList } from "../game/game.state";
 
 export function PlayerTag(props: {
   children: ReactNode;
@@ -18,7 +19,8 @@ export function PlayerTag(props: {
 export function PlayersList() {
   // TODO: to pure component
   const currentPlayer = usePlayer();
-  const { players, tempVoteResults } = useGame();
+  const { tempVoteResults } = useGame();
+  const [players] = useOnlinePlayersList();
 
   return (
     <Space>

@@ -12,9 +12,15 @@ import { IGameState } from "../../game/game-state.model";
 import { ReactElement } from "react";
 import { useGame } from "../../app/app-state.context";
 import { useDealer } from "../dealer.context";
+import { IPlayer } from "../../player/player.model";
+import { useOnlinePlayersList } from "../../game/game.state";
 
-function getDescription(item: IVoteItem, state: IGameState): ReactElement {
-  const { voteItem: currentVoteItem, players, tempVoteResults } = state;
+function getDescription(
+  item: IVoteItem,
+  state: IGameState,
+  players: IPlayer[]
+): ReactElement {
+  const { voteItem: currentVoteItem, tempVoteResults } = state;
   const isCurrentVoteItem = currentVoteItem?.id === item.id;
 
   if (isCurrentVoteItem) {
@@ -43,6 +49,7 @@ export function VoteItemsList(props: {
   issues: IVoteItem[];
   submitVoting: () => void;
 }) {
+  const [players] = useOnlinePlayersList();
   const game = useGame();
   const voteItem = game.voteItem;
   const dealer = useDealer();
@@ -93,7 +100,7 @@ export function VoteItemsList(props: {
                 )}
               </div>
             }
-            description={getDescription(x, game)}
+            description={getDescription(x, game, players)}
           />
         </Card>
       ))}

@@ -12,6 +12,7 @@ import {
 } from "./voting.model";
 import { useState } from "react";
 import { useDealer } from "../dealer/dealer.context";
+import { useOnlinePlayersList as useOnlinePlayersList } from "../game/game.state";
 
 const MOCK = true;
 
@@ -65,7 +66,8 @@ function calculateResultsMocked(
 }
 
 export function VoteResult(props: { onRevote: () => void }) {
-  const { players, tempVoteResults } = useGame();
+  const [players] = useOnlinePlayersList();
+  const { tempVoteResults } = useGame();
   const [result, setResult] = useState<VoteValue | null>(null);
   const dealer = useDealer();
 
