@@ -1,11 +1,11 @@
 import { Button, Input } from "antd";
 import { IssueParsingService } from "../../issue/issue.service";
 import { useState } from "react";
-import { IVoteItem } from "../../voting/voting.model";
+import { IIssue } from "../../issue/issue.model";
 
 const parser = new IssueParsingService();
 
-export function AddVoteItem(props: { addIssue: (issue: IVoteItem) => void }) {
+export function AddVoteItem(props: { addIssue: (issue: IIssue) => void }) {
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
 

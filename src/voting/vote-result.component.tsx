@@ -67,7 +67,7 @@ function calculateResultsMocked(
 
 export function VoteResult(props: { onRevote: () => void }) {
   const [players] = useOnlinePlayersList();
-  const { tempVoteResults } = useGame();
+  const { results: tempVoteResults } = useGame();
   const [result, setResult] = useState<VoteValue | null>(null);
   const dealer = useDealer();
 

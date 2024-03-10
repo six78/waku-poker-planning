@@ -21,7 +21,7 @@ export function SetVoteItem() {
         return;
       }
 
-      dealer.setVoteItem({
+      dealer.startVoting({
         id: generateGuid(),
         name: changes.title!,
       });

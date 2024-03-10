@@ -5,22 +5,22 @@ import {
   ExportOutlined,
   QuestionCircleOutlined,
 } from "@ant-design/icons";
-import { IVoteItem } from "../../voting/voting.model";
 import Card from "antd/es/card/Card";
 import Meta from "antd/es/card/Meta";
-import { IGameState } from "../../game/game-state.model";
 import { ReactElement } from "react";
 import { useGame } from "../../app/app-state.context";
 import { useDealer } from "../dealer.context";
 import { IPlayer } from "../../player/player.model";
 import { useOnlinePlayersList } from "../../game/game.state";
+import { IIssue } from "../../issue/issue.model";
+import { IVotingState } from "../../voting/voting.model";
 
 function getDescription(
-  item: IVoteItem,
-  state: IGameState,
+  item: IIssue,
+  state: IVotingState,
   players: IPlayer[]
 ): ReactElement {
-  const { voteItem: currentVoteItem, tempVoteResults } = state;
+  const { issue: currentVoteItem, results: tempVoteResults } = state;
   const isCurrentVoteItem = currentVoteItem?.id === item.id;
 
   if (isCurrentVoteItem) {
@@ -46,16 +46,16 @@ function getDescription(
 }
 
 export function VoteItemsList(props: {
-  issues: IVoteItem[];
+  issues: IIssue[];
   submitVoting: () => void;
 }) {
   const [players] = useOnlinePlayersList();
   const game = useGame();
-  const voteItem = game.voteItem;
+  const voteItem = game.issue;
   const dealer = useDealer();
 
-  function startVoting(item: IVoteItem): void {
-    dealer?.setVoteItem(item);
+  function startVoting(item: IIssue): void {
+    dealer?.startVoting(item);
   }
 
   return (

@@ -19,7 +19,7 @@ export function PlayerTag(props: {
 export function PlayersList() {
   // TODO: to pure component
   const currentPlayer = usePlayer();
-  const { tempVoteResults } = useGame();
+  const { results: tempVoteResults } = useGame();
   const [players] = useOnlinePlayersList();
 
   return (

@@ -1,12 +1,12 @@
 import { DealerEventsService } from '../dealer/dealer-events.service';
-import { IGameState } from './game-state.model';
-import { IPlayerVoteMessage } from './game-message.model';
-import { IVoteItem } from '../voting/voting.model';
+import { IIssue } from '../issue/issue.model';
+import { IVotingState } from '../voting/voting.model';
+import { IPlayerVoteMessage } from '../app/app-waku-message.model';
 
 export class GameStateSyncService {
-  private state: IGameState = {
-    voteItem: null,
-    tempVoteResults: null
+  private state: IVotingState = {
+    issue: null,
+    results: null
   }
 
   constructor(private readonly dealerEventsService: DealerEventsService) { }
@@ -26,20 +26,20 @@ export class GameStateSyncService {
     return this;
   }
 
-  public startVoting(voteItem: IVoteItem): void {
-    this.state.voteItem = voteItem;
-    this.state.tempVoteResults = {};
+  public startVoting(voteItem: IIssue): void {
+    this.state.issue = voteItem;
+    this.state.results = {};
     this.sendStateToNetwork();
   }
 
   public endVoting(): void {
-    this.state.voteItem = null;
-    this.state.tempVoteResults = null;
+    this.state.issue = null;
+    this.state.results = null;
     this.sendStateToNetwork();
   }
 
   public revote(): void {
-    this.state.tempVoteResults = null;
+    this.state.results = null;
     this.sendStateToNetwork();
   }
 
@@ -49,16 +49,16 @@ export class GameStateSyncService {
   }
 
   private onPlayerVote(message: IPlayerVoteMessage): void {
-    const voteInProgress = this.state.voteItem && this.state.tempVoteResults;
+    const voteInProgress = this.state.issue && this.state.results;
 
-    if (!voteInProgress || message.voteFor !== this.state.voteItem?.id) {
+    if (!voteInProgress || message.voteFor !== this.state.issue?.id) {
       return;
     }
 
     if (message.voteResult === null) {
-      delete this.state.tempVoteResults![message.voteBy];
+      delete this.state.results![message.voteBy];
     } else {
-      this.state.tempVoteResults![message.voteBy] = message.voteResult
+      this.state.results![message.voteBy] = message.voteResult
     }
 
     this.sendStateToNetwork();

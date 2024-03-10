@@ -1,3 +1,4 @@
+import { IIssue } from '../issue/issue.model';
 import { PlayerId, PlayerName } from '../player/player.model';
 
 export const NO_VOTE_LABEL = 'No vote';
@@ -9,11 +10,7 @@ export interface IVoteResult {
   [key: VoteValue]: PlayerName[];
 }
 
-export interface IVoteItem {
-  id: string;
-  name: string;
-  url?: string;
-  description?: string
-  result?: number;
-  voteHistory?: { [key: PlayerId]: number };
+export interface IVotingState {
+  issue: IIssue | null;
+  results: { [key: PlayerId]: VoteValue } | null;
 }

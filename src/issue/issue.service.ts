@@ -1,6 +1,6 @@
 import { IGithubIssue } from './providers/github.model';
 import { generateGuid } from '../shared/guid';
-import { IVoteItem } from '../voting/voting.model';
+import { IIssue } from './issue.model';
 
 const settings = {
   github: {
@@ -10,7 +10,7 @@ const settings = {
 }
 
 export class IssueParsingService {
-  public async createIssueFromString(data: string): Promise<IVoteItem> {
+  public async createIssueFromString(data: string): Promise<IIssue> {
     if (!this.isUrl) {
       return this.createEmptyIssue(data);
     }
@@ -31,7 +31,7 @@ export class IssueParsingService {
     return url.protocol === "http:" || url.protocol === "https:";
   }
 
-  private async tryParsePublicGithubIssue(url: string): Promise<IVoteItem | null> {
+  private async tryParsePublicGithubIssue(url: string): Promise<IIssue | null> {
     const isGithub = url.indexOf(settings.github.url) === 0;
 
     if (!isGithub) {
@@ -58,7 +58,7 @@ export class IssueParsingService {
     }
   }
 
-  private createEmptyIssue(name: string): IVoteItem {
+  private createEmptyIssue(name: string): IIssue {
     return {
       id: generateGuid(),
       name

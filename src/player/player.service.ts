@@ -1,4 +1,4 @@
-import { IGameState } from '../game/game-state.model';
+import { IVotingState } from '../voting/voting.model';
 import { WakuNodeService } from '../waku/waku-node.service';
 import { PlayerEventsService } from './player-events.service';
 import { IPlayer, PlayerId, PlayerName } from './player.model';
@@ -28,7 +28,7 @@ export class PlayerService {
     })
   }
 
-  public onStateChanged(callback: (state: Omit<IGameState, 'players'>) => void): this {
+  public onStateChanged(callback: (state: IVotingState) => void): this {
     this.events.onStateChanged(callback);
     return this;
   }

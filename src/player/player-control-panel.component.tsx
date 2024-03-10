@@ -14,7 +14,7 @@ export function PlayerControlPanel() {
   const [messageApi, contextHolder] = useMessage();
   const player = usePlayer()!;
 
-  const { voteItem: issue, tempVoteResults } = useGame();
+  const { issue: issue, results: tempVoteResults } = useGame();
 
   // Player vote stored in the game state
   const appliedVote = (tempVoteResults || {})[player.playerId];

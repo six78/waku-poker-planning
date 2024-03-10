@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { AddVoteItem } from "./components/add-vote-item.component";
 import { VoteItemsList } from "./components/vote-items-list.component";
-import { IVoteItem } from "../voting/voting.model";
 import { useGame } from "../app/app-state.context";
+import { IIssue } from "../issue/issue.model";
 
 export function DealerControlPanel(props: {
-  revealVotes: (voteItem: IVoteItem) => void;
+  revealVotes: (voteItem: IIssue) => void;
 }) {
   const game = useGame();
-  const [voteItems, setVoteItems] = useState<IVoteItem[]>([]);
+  const [voteItems, setVoteItems] = useState<IIssue[]>([]);
 
   function submitVoting(): void {
-    if (!game.voteItem) {
+    if (!game.issue) {
       return;
     }
 
-    props.revealVotes(game.voteItem);
+    props.revealVotes(game.issue);
     return;
 
     // dealer.endVoting();

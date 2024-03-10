@@ -1,9 +1,9 @@
 import Title from "antd/es/typography/Title";
 import { PlayerControlPanel } from "../player/player-control-panel.component";
 import Markdown from "react-markdown";
-import { IVoteItem } from "../voting/voting.model";
 import { PlayersList } from "../player/players-list.component";
 import { useGame } from "../app/app-state.context";
+import { IIssue } from "../issue/issue.model";
 
 function NoVoteItem() {
   return (
@@ -14,7 +14,7 @@ function NoVoteItem() {
   );
 }
 
-function IssueVoteComponent(props: { item: IVoteItem }) {
+function IssueVoteComponent(props: { item: IIssue }) {
   const { item } = props;
   return (
     <div className="flex flex-col h-full">
@@ -30,7 +30,7 @@ function IssueVoteComponent(props: { item: IVoteItem }) {
 
 export function Deck() {
   const game = useGame();
-  const voteItem = game.voteItem;
+  const voteItem = game.issue;
 
   return (
     <div className="bg-white text-gray-900 h-full w-full p-6">

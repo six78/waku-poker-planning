@@ -1,7 +1,7 @@
 import { LogLevel } from './../app/app.const';
 import { Callback, Decoder, Encoder, IDecodedMessage, IDecoder, IEncoder, IFilter, ILightPush, IMessage as IWakuMessage, Protocols, SendResult, Unsubscribe, createDecoder, createEncoder, createLightNode, waitForRemotePeer } from '@waku/sdk';
 import { wakuDnsDiscovery } from "@waku/dns-discovery";
-import { IMessage } from '../game/game-message.model';
+import { IMessage } from '../app/app-waku-message.model';
 import { appConfig } from '../app/app.config';
 import { PUBSUB_TOPIC } from '../app/app.const';
 

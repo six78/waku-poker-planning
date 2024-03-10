@@ -3,12 +3,12 @@ import { Header } from "../page-layout/header.component";
 import { Deck } from "../deck/deck.component";
 import { usePlayer } from "../player/player.context";
 import { useEffect, useState } from "react";
-import { IGameState } from "../game/game-state.model";
 import { DealerControlPanel } from "../dealer/dealer-control-panel.component";
 import { VoteResult } from "../voting/vote-result.component";
 import { useDealer } from "../dealer/dealer.context";
-import { IVoteItem } from "../voting/voting.model";
 import { useOnlinePlayersList } from "../game/game.state";
+import { IVotingState } from "../voting/voting.model";
+import { IIssue } from "../issue/issue.model";
 
 export function Room() {
   const player = usePlayer()!;
@@ -17,9 +17,9 @@ export function Room() {
 
   const [players, setPlayers] = useOnlinePlayersList();
 
-  const [state, setState] = useState<IGameState>({
-    voteItem: null,
-    tempVoteResults: null,
+  const [state, setState] = useState<IVotingState>({
+    issue: null,
+    results: null,
   });
 
   useEffect(() => {
@@ -40,8 +40,8 @@ export function Room() {
     dealer.revote();
   }
 
-  function reveal(voteItem: IVoteItem): void {
-    if (voteItem.id !== state.voteItem?.id) {
+  function reveal(voteItem: IIssue): void {
+    if (voteItem.id !== state.issue?.id) {
       return;
     }
 

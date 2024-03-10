@@ -1,5 +1,5 @@
 import { GameStateSyncService } from '../game/game-state-sync.service';
-import { IVoteItem } from '../voting/voting.model';
+import { IIssue } from '../issue/issue.model';
 import { WakuNodeService } from '../waku/waku-node.service';
 import { DealerEventsService } from './dealer-events.service';
 
@@ -16,7 +16,7 @@ export class DealerService {
       .enableIntervalSync(10000);
   }
 
-  public setVoteItem(item: IVoteItem): void {
+  public startVoting(item: IIssue): void {
     this.gameStateSyncService.startVoting(item);
   }
 

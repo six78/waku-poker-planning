@@ -1,5 +1,5 @@
-import { IParticipantOnlineMessage, IPlayerVoteMessage } from '../game/game-message.model';
-import { IGameState } from '../game/game-state.model';
+import { IParticipantOnlineMessage, IPlayerVoteMessage } from '../app/app-waku-message.model';
+import { IVotingState } from '../voting/voting.model';
 import { WakuNodeService } from '../waku/waku-node.service';
 import { IPlayer } from './player.model';
 
@@ -28,7 +28,7 @@ export class PlayerEventsService {
     this.node.send(message);
   }
 
-  public onStateChanged(callback: (state: Omit<IGameState, 'players'>) => void) {
+  public onStateChanged(callback: (state: IVotingState) => void) {
     this.node.subscribe(message => {
       if (message.type === '__state') {
         console.log('trying apply state', message.state);

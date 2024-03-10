@@ -1,10 +1,9 @@
 import { createContext, useContext } from 'react';
-import { IGameState } from '../game/game-state.model';
+import { IVotingState } from '../voting/voting.model';
 
-export const GameStateContext = createContext<IGameState>({
-  // TODO: rename to "issue"
-  voteItem: null,
-  tempVoteResults: null
+export const GameStateContext = createContext<IVotingState>({
+  issue: null,
+  results: null
 });
 
 export const useGame = () => useContext(GameStateContext);
