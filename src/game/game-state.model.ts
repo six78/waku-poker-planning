@@ -2,6 +2,8 @@ import { IPlayer, PlayerId } from '../player/player.model';
 import { IVoteItem, VoteValue } from '../voting/voting.model';
 
 export interface IGameState {
+  // For now there are 2 states - GameState (with players, for onlyc local purpose) and WakuGameState (without players, managed by dealer)
+  // Seems we need 2 different models without to avoid Omit<> usages 
   players: IPlayer[];
   voteItem: IVoteItem | null;
   tempVoteResults: { [key: PlayerId]: VoteValue } | null;

@@ -1,15 +1,15 @@
 import { Button, Form, Input, Modal } from "antd";
 import { useState } from "react";
 import { useFormService } from "../../shared/form/form.service";
-import { useDealerContext } from "../dealer.context";
 import { generateGuid } from "../../shared/guid";
+import { useDealer } from "../dealer.context";
 
 interface IVoteItemModel {
   title: string;
 }
 
 export function SetVoteItem() {
-  const dealerService = useDealerContext()!;
+  const dealer = useDealer()!;
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const formService = useFormService<IVoteItemModel>({
@@ -21,7 +21,7 @@ export function SetVoteItem() {
         return;
       }
 
-      dealerService.setVoteItem({
+      dealer.setVoteItem({
         id: generateGuid(),
         name: changes.title!,
       });

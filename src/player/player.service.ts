@@ -28,9 +28,13 @@ export class PlayerService {
     })
   }
 
-  public onStateChanged(callback: (state: IGameState) => void): this {
+  public onStateChanged(callback: (state: Omit<IGameState, 'players'>) => void): this {
     this.events.onStateChanged(callback);
     return this;
+  }
+
+  public onPlayerOnline(callback: (player: IPlayer) => void): void {
+    this.events.onPlayerOnline(callback);
   }
 
   public enableHeartBeat(): this {

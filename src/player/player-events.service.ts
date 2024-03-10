@@ -28,11 +28,19 @@ export class PlayerEventsService {
     this.node.send(message);
   }
 
-  public onStateChanged(callback: (state: IGameState) => void) {
+  public onStateChanged(callback: (state: Omit<IGameState, 'players'>) => void) {
     this.node.subscribe(message => {
       if (message.type === '__state') {
         console.log('trying apply state', message.state);
         callback(message.state);
+      }
+    })
+  }
+
+  public onPlayerOnline(callback: (state: IPlayer) => void) {
+    this.node.subscribe(message => {
+      if (message.type === "__player_online") {
+        callback(message.player);
       }
     })
   }

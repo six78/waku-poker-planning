@@ -5,7 +5,7 @@ export type IMessage = IPlayerMessage | IStateMessage;
 
 export interface IStateMessage {
   type: '__state';
-  state: IGameState;
+  state: Omit<IGameState, 'players'>;
 }
 
 export type IPlayerMessage = IParticipantOnlineMessage | IPlayerVoteMessage;

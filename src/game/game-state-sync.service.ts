@@ -1,6 +1,6 @@
 import { DealerEventsService } from '../dealer/dealer-events.service';
 import { IGameState } from './game-state.model';
-import { IParticipantOnlineMessage, IPlayerVoteMessage } from './game-message.model';
+import { IPlayerVoteMessage } from './game-message.model';
 import { IVoteItem } from '../voting/voting.model';
 
 export class GameStateSyncService {
@@ -15,9 +15,6 @@ export class GameStateSyncService {
   public init(): this {
     this.dealerEventsService.onMessageReceived(message => {
       switch (message.type) {
-        case '__player_online':
-          this.onParticipantOnline(message);
-          break;
         case '__player_vote':
           this.onPlayerVote(message);
           break;
@@ -50,15 +47,6 @@ export class GameStateSyncService {
   public enableIntervalSync(timeout: number): this {
     setInterval(() => this.sendStateToNetwork(), timeout);
     return this
-  }
-
-  private onParticipantOnline(message: IParticipantOnlineMessage): void {
-    if (this.state.players.some(participant => participant.id === message.player.id)) {
-      return;
-    }
-
-    this.state.players.push(message.player);
-    this.sendStateToNetwork();
   }
 
   private onPlayerVote(message: IPlayerVoteMessage): void {

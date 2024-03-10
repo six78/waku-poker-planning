@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useDealer } from "./dealer.context";
 import { AddVoteItem } from "./components/add-vote-item.component";
 import { VoteItemsList } from "./components/vote-items-list.component";
 import { IVoteItem } from "../voting/voting.model";
@@ -8,7 +7,6 @@ import { useGame } from "../app/app-state.context";
 export function DealerControlPanel(props: {
   revealVotes: (voteItem: IVoteItem) => void;
 }) {
-  const dealer = useDealer();
   const game = useGame();
   const [voteItems, setVoteItems] = useState<IVoteItem[]>([]);
 
@@ -20,19 +18,19 @@ export function DealerControlPanel(props: {
     props.revealVotes(game.voteItem);
     return;
 
-    dealer.endVoting();
+    // dealer.endVoting();
 
-    // TODO: calculate results
-    setVoteItems(
-      voteItems.map((x) => {
-        if (x.id === game.voteItem!.id) {
-          x.result = 8;
-          x.voteHistory = game.tempVoteResults || {};
-        }
+    // // TODO: calculate results
+    // setVoteItems(
+    //   voteItems.map((x) => {
+    //     if (x.id === game.voteItem!.id) {
+    //       x.result = 8;
+    //       x.voteHistory = game.tempVoteResults || {};
+    //     }
 
-        return x;
-      })
-    );
+    //     return x;
+    //   })
+    // );
   }
 
   return (

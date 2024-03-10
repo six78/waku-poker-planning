@@ -21,7 +21,21 @@ export function Room() {
   });
 
   useEffect(() => {
-    player.onStateChanged(setState).enableHeartBeat();
+    player
+      .onStateChanged((newState) => {
+        setState({
+          ...newState,
+          players: state.players,
+        });
+      })
+      .enableHeartBeat()
+      .onPlayerOnline((player) => {
+        if (state.players.some((participant) => participant.id === player.id)) {
+          return;
+        }
+
+        setState({ ...state, players: [...state.players, player] });
+      });
   }, [player]);
 
   function onRevote() {

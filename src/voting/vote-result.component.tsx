@@ -4,15 +4,25 @@ import { IPlayer, PlayerId, PlayerName } from "../player/player.model";
 import { PlayerTag } from "../player/players-list.component";
 import { generateHash } from "../shared/random-hash";
 import { VoteOption } from "./vote-option.component";
-import { IVoteResult, NO_VOTE_LABEL, VoteValue } from "./voting.model";
+import {
+  IVoteResult,
+  NO_VOTE_LABEL,
+  VoteValue,
+  VoteValueOrNoVote,
+} from "./voting.model";
 import { useState } from "react";
-import { usePlayer } from "../player/player.context";
 import { useDealer } from "../dealer/dealer.context";
+
+const MOCK = true;
 
 function calculateResults(
   players: IPlayer[],
   votes: { [key: PlayerId]: VoteValue }
 ): IVoteResult {
+  if (MOCK) {
+    return calculateResultsMocked(players, votes);
+  }
+
   return players.reduce((result: IVoteResult, player) => {
     const vote = votes[player.id] || NO_VOTE_LABEL;
     if (!result[vote]) {
@@ -64,7 +74,7 @@ export function VoteResult(props: { onRevote: () => void }) {
     throw new Error("");
   }
 
-  function handleVoteClick(vote: VoteValue): void {
+  function handleVoteClick(vote: VoteValueOrNoVote): void {
     if (!dealer || vote === NO_VOTE_LABEL) {
       return;
     }
@@ -76,7 +86,7 @@ export function VoteResult(props: { onRevote: () => void }) {
     props.onRevote();
   }
 
-  const votes = calculateResultsMocked(players, tempVoteResults);
+  const votes = calculateResults(players, tempVoteResults);
   console.log(votes);
 
   return (
@@ -94,7 +104,7 @@ export function VoteResult(props: { onRevote: () => void }) {
       }
     >
       {Object.entries(votes).map((entry) => {
-        const vote = entry[0] as VoteValue;
+        const vote = entry[0] as VoteValueOrNoVote;
         const players = entry[1] as PlayerName[];
 
         return (

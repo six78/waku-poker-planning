@@ -32,10 +32,6 @@ export function PlayerControlPanel() {
   }, []);
 
   useEffect(() => {
-    console.log("VOTE APPLIED", appliedVote);
-    console.log("PENDING VOTE:", pendingVote);
-    console.log("REVOKED VOTE:", revokedVote);
-
     if (revokedVote) {
       if (!appliedVote) {
         setPendingVote(null);

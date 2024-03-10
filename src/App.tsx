@@ -43,10 +43,7 @@ export function App() {
         return;
       }
 
-      if (isDealer) {
-        setDealerService(new DealerService(node));
-      }
-
+      setDealerService(isDealer ? new DealerService(node) : null);
       setPlayerService(new PlayerService(node, { ...user, isDealer }));
       setNode(node);
     });

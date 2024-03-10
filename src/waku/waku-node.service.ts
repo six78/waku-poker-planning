@@ -1,8 +1,21 @@
+import { LogLevel } from './../app/app.const';
 import { Callback, Decoder, Encoder, IDecodedMessage, IDecoder, IEncoder, IFilter, ILightPush, IMessage as IWakuMessage, Protocols, SendResult, Unsubscribe, createDecoder, createEncoder, createLightNode, waitForRemotePeer } from '@waku/sdk';
 import { wakuDnsDiscovery } from "@waku/dns-discovery";
 import { IMessage } from '../game/game-message.model';
 import { appConfig } from '../app/app.config';
 import { PUBSUB_TOPIC } from '../app/app.const';
+
+export const MESSAGE = {
+  STATE: '__state',
+  PLAYER_ONLINE: '__player_online',
+  PLAYER_VOTED: '__player_vote'
+}
+
+// TODO: this file is to big
+const logLevel = new Map<LogLevel, string[]>();
+logLevel.set(LogLevel.None, []);
+logLevel.set(LogLevel.State, [MESSAGE.STATE]);
+logLevel.set(LogLevel.All, [MESSAGE.STATE, MESSAGE.PLAYER_ONLINE, MESSAGE.PLAYER_VOTED]);
 
 
 interface IWakuLightNode {
@@ -26,7 +39,6 @@ class WakuFakeLightNode implements IWakuLightNode {
     send: this.send
   };
 }
-
 
 export async function createWakuNodeService(contentTopic: string): Promise<WakuNodeService> {
   if (appConfig.fakeNode) {
@@ -85,7 +97,10 @@ export class WakuNodeService {
   private async initSubscription(): Promise<void> {
     await this.node.filter.subscribe([this.decoder], rawMessage => {
       const message = JSON.parse(this.decodeUtf8((rawMessage as any).proto.payload)) as IMessage;
-      console.log('RECEIVED', message);
+      const messagesToLog = logLevel.get(appConfig.logLevel) || [];
+      if (messagesToLog.includes(message.type)) {
+        console.log('RECEIVED', message);
+      }
       this.callbacks.forEach(x => x(message));
     })
   }

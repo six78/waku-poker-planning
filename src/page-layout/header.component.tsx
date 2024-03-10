@@ -1,7 +1,3 @@
-import { Button, Form, Input, Modal, Switch } from "antd";
-import { SettingFilled } from "@ant-design/icons";
-import { useState } from "react";
-
 // interface ISettings {
 //   playersName: string;
 //   isDealer: boolean;
@@ -9,7 +5,7 @@ import { useState } from "react";
 
 // TODO: refactor renaming
 export function Header() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
 
   // const formService = useFormService<ISettings>({
   //   initialValue: {
@@ -43,7 +39,7 @@ export function Header() {
   return (
     <>
       <div className="w-full h-full px-4 bg-white flex items-center justify-end">
-        <Button onClick={() => setIsModalOpen(true)} icon={<SettingFilled />} />
+        {/* <Button onClick={() => setIsModalOpen(true)} icon={<SettingFilled />} /> */}
       </div>
 
       {/* <Modal
