@@ -1,66 +1,27 @@
-// interface ISettings {
-//   playersName: string;
-//   isDealer: boolean;
-// }
+import { Button, Space } from "antd";
+import useMessage from "antd/es/message/useMessage";
+import { useParams } from "react-router-dom";
+import { copyTextToClipboard } from "../shared/clipboard";
 
-// TODO: refactor renaming
 export function Header() {
-  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const [messageApi, contextHolder] = useMessage();
+  const { id: roomId } = useParams();
 
-  // const formService = useFormService<ISettings>({
-  //   initialValue: {
-  //     isDealer: appContext.userService.isDealer,
-  //     playersName: appContext.userService.name,
-  //   },
-  //   onFinish: (changes) => {
-  //     if (changes) {
-  //       appContext.userService.update({
-  //         id: appContext.userService.id,
-  //         name: changes.playersName || appContext.userService.name,
-  //         isDealer:
-  //           changes.isDealer === undefined
-  //             ? appContext.userService.isDealer
-  //             : changes.isDealer,
-  //       });
-  //     }
-  //     console.log(changes);
-  //   },
-  // });
-
-  // function close() {
-  //   setIsModalOpen(false);
-  //   formService?.reset();
-  // }
-
-  // if (!formService) {
-  //   return <></>;
-  // }
+  function copyToClipboard(value: string): void {
+    copyTextToClipboard(value)
+      .then(() => messageApi.success(`${value} was copied to a clipboard`))
+      .catch(() => messageApi.error(`Couldn't copy to a clipboard`));
+  }
 
   return (
-    <>
-      <div className="w-full h-full px-4 bg-white flex items-center justify-end">
-        {/* <Button onClick={() => setIsModalOpen(true)} icon={<SettingFilled />} /> */}
-      </div>
-
-      {/* <Modal
-        title="Settings"
-        open={isModalOpen}
-        onOk={() => formService.instance.submit()}
-        onCancel={() => close()}
-      >
-        <Form
-          layout="vertical"
-          form={formService.instance}
-          onFinish={formService.onFinish}
-        >
-          <Form.Item name="playersName" label="Player's Name">
-            <Input />
-          </Form.Item>
-          <Form.Item name="isDealer" label="Is Dealer" valuePropName="checked">
-            <Switch />
-          </Form.Item>
-        </Form>
-      </Modal> */}
-    </>
+    <div className="w-full h-full px-4 bg-white flex items-center justify-end">
+      {contextHolder}
+      <Space>
+        <Button onClick={() => copyToClipboard(roomId!)}>Copy room hash</Button>
+        <Button onClick={() => copyToClipboard(location.href)}>
+          Copy game url
+        </Button>
+      </Space>
+    </div>
   );
 }

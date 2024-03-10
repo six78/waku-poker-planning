@@ -16,7 +16,7 @@ import {
   useVoting,
 } from "../app/app.state";
 
-const MOCK = true;
+const MOCK = false;
 
 function calculateResults(
   players: IPlayer[],

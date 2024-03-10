@@ -1,4 +1,4 @@
-import { Button, Input } from "antd";
+import { Button, Input, Space } from "antd";
 import { useState } from "react";
 import { IIssue } from "../../issue/issue.model";
 import { createIssueFromString } from "../../issue/issue-parsing.service";
@@ -29,23 +29,22 @@ export function AddIssue(props: { addIssue: (issue: IIssue) => void }) {
   }
 
   return (
-    <div className="grid grid-rows-2 gap-4">
+    <Space.Compact block>
       <Input
         allowClear
         value={value}
         onChange={onChange}
         placeholder="Issue link or title"
-        className="mb-3"
       ></Input>
       <Button
         disabled={value.length === 0}
         loading={loading}
         type="primary"
-        className="justify-self-end"
+        style={{ width: "4rem" }}
         onClick={onAdd}
       >
-        Add
+        {loading ? "" : "Add"}
       </Button>
-    </div>
+    </Space.Compact>
   );
 }

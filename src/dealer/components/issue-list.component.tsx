@@ -1,4 +1,4 @@
-import { Button, Progress, Tooltip } from "antd";
+import { Button, Progress, Space, Tooltip } from "antd";
 import {
   CheckCircleOutlined,
   DeleteOutlined,
@@ -55,7 +55,12 @@ export function IssueList(props: { issues: IIssue[]; reveal: () => void }) {
   }
 
   return (
-    <div>
+    <Space
+      direction="vertical"
+      className="overflow-auto flex-grow"
+      size="middle"
+      style={{ display: "flex" }}
+    >
       {props.issues.map((x) => (
         <Card
           key={x.id}
@@ -88,7 +93,11 @@ export function IssueList(props: { issues: IIssue[]; reveal: () => void }) {
             }
             title={
               <div className="flex justify-between">
-                {x.name}{" "}
+                <Tooltip placement="top" title={x.name}>
+                  <span className="overflow-hidden text-ellipsis">
+                    {x.name}
+                  </span>
+                </Tooltip>
                 {x.url && (
                   <a href={x.url} target="_blank">
                     <ExportOutlined />
@@ -100,6 +109,6 @@ export function IssueList(props: { issues: IIssue[]; reveal: () => void }) {
           />
         </Card>
       ))}
-    </div>
+    </Space>
   );
 }
