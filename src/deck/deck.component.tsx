@@ -6,8 +6,6 @@ import { IIssue } from "../issue/issue.model";
 import { useVoting } from "../app/app.state";
 import { useEffect, useState } from "react";
 import { tryGetIssueDescription } from "../issue/issue-parsing.service";
-import Link from "antd/es/typography/Link";
-import { ExportOutlined } from "@ant-design/icons";
 
 function NoVoteItem() {
   return (
