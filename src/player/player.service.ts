@@ -46,7 +46,7 @@ export class PlayerService {
 
     this.events.playerIsOnline(player);
 
-    setTimeout(() => {
+    setInterval(() => {
       this.events.playerIsOnline(player);
     }, 10 * 1000);
 

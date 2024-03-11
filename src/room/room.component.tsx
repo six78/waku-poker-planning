@@ -1,19 +1,24 @@
 import { Header } from "../page-layout/header.component";
 import { Deck } from "../deck/deck.component";
 import { usePlayer } from "../player/player.context";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DealerControlPanel } from "../dealer/dealer-control-panel.component";
 import { VoteResult } from "../voting/vote-result.component";
 import { useDealer } from "../dealer/dealer.context";
 import { useIssues, useOnlinePlayersList, useVoting } from "../app/app.state";
 import { IIssue } from "../issue/issue.model";
 import { VoteValue } from "../voting/voting.model";
+import { IPlayer } from "../player/player.model";
 
 export function Room() {
   const player = usePlayer()!;
   const dealer = useDealer();
   const [revealVotes, setRevealVotes] = useState(false);
   const [players, setPlayers] = useOnlinePlayersList();
+
+  const playersRef = useRef<IPlayer[]>(players);
+  playersRef.current = players;
+
   const [voting, setVoting] = useVoting();
   const [issues, setIssues] = useIssues();
 
@@ -24,13 +29,17 @@ export function Room() {
       .onStateChanged(setVoting)
       .enableHeartBeat()
       .onPlayerOnline((player) => {
-        if (players.some((participant) => participant.id === player.id)) {
+        if (
+          playersRef.current!.some(
+            (participant) => participant.id === player.id
+          )
+        ) {
           return;
         }
 
-        setPlayers([...players, player]);
+        setPlayers([...playersRef.current!, player]);
       });
-  }, [player]);
+  }, []);
 
   function revote() {
     setRevealVotes(false);
