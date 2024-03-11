@@ -8,16 +8,13 @@ import { useDealer } from "../dealer/dealer.context";
 import { useIssues, useOnlinePlayersList, useVoting } from "../app/app.state";
 import { IIssue } from "../issue/issue.model";
 import { VoteValue } from "../voting/voting.model";
-import { IPlayer } from "../player/player.model";
 
 export function Room() {
   const player = usePlayer()!;
   const dealer = useDealer();
   const [revealVotes, setRevealVotes] = useState(false);
-  const [players, setPlayers] = useOnlinePlayersList();
-
-  const playersRef = useRef<IPlayer[]>(players);
-  playersRef.current = players;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, setPlayers] = useOnlinePlayersList();
 
   const [voting, setVoting] = useVoting();
   const [issues, setIssues] = useIssues();
@@ -29,15 +26,12 @@ export function Room() {
       .onStateChanged(setVoting)
       .enableHeartBeat()
       .onPlayerOnline((player) => {
-        if (
-          playersRef.current!.some(
-            (participant) => participant.id === player.id
-          )
-        ) {
-          return;
-        }
-
-        setPlayers([...playersRef.current!, player]);
+        setPlayers((players) => {
+          if (players.some((participant) => participant.id === player.id)) {
+            return players;
+          }
+          return [...players, player];
+        });
       });
   }, []);
 

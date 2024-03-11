@@ -1,13 +1,13 @@
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { StyleProvider } from "@ant-design/cssinjs";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { RouterProvider, createHashRouter } from "react-router-dom";
 import { AuthorizedUserGuard } from "./user/authorized-user-guard.component";
 import { UserAuth } from "./user/user-auth.component";
 import { CreateOrJoinRoom } from "./room/create-or-join-room.component";
 import { App } from "./App";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: (

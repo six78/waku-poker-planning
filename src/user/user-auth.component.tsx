@@ -4,7 +4,8 @@ import {
   getUserDataFromLocalStorage,
   saveUserToLocalStorage,
 } from "./current-user";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { REDIRECT_TO_ROOM_URL_PARAM } from "../app/app.router";
 
 function normalizeUserName(name: string): string {
   return name.trim();
@@ -15,6 +16,7 @@ function isValidUserName(name: string): boolean {
 }
 
 export function UserAuth() {
+  const [searchParams] = useSearchParams();
   const user = getUserDataFromLocalStorage();
   const navigate = useNavigate();
   const input = useRef<InputRef>(null);
@@ -27,7 +29,8 @@ export function UserAuth() {
     const userName = normalizeUserName(input.current?.input?.value || "");
     if (isValidUserName(userName)) {
       saveUserToLocalStorage(userName);
-      navigate("/");
+      const roomId = searchParams.get(REDIRECT_TO_ROOM_URL_PARAM);
+      navigate(roomId ? `/room/${roomId}` : "/");
     }
   }
 

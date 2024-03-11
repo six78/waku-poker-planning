@@ -1,0 +1,1 @@
+export const REDIRECT_TO_ROOM_URL_PARAM = 'redirectToRoom';
