@@ -11,13 +11,15 @@ import { VoteValue } from "../voting/voting.model";
 
 export function Room() {
   const player = usePlayer()!;
-  const dealer = useDealer()!;
+  const dealer = useDealer();
   const [revealVotes, setRevealVotes] = useState(false);
   const [players, setPlayers] = useOnlinePlayersList();
   const [voting, setVoting] = useVoting();
   const [issues, setIssues] = useIssues();
 
   useEffect(() => {
+    dealer?.init(voting).enableIntervalSync(10000);
+
     player
       .onStateChanged(setVoting)
       .enableHeartBeat()
@@ -32,7 +34,7 @@ export function Room() {
 
   function revote() {
     setRevealVotes(false);
-    dealer.revote();
+    dealer?.revote();
   }
 
   function reveal(issue: IIssue): void {
@@ -45,7 +47,7 @@ export function Room() {
 
   function submit(result: VoteValue): void {
     setRevealVotes(false);
-    dealer.endVoting();
+    dealer?.endVoting();
     setIssues(
       issues.map((x) => {
         if (x.id === voting.issue?.id) {
@@ -71,7 +73,7 @@ export function Room() {
             <Deck></Deck>
           </div>
         </div>
-        {player.isDealer && (
+        {dealer && (
           <div className="w-96 border-l border-gray-300">
             <DealerControlPanel revealVotes={reveal} />
           </div>

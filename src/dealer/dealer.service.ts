@@ -1,30 +1,86 @@
-import { GameStateSyncService } from '../game/game-state-sync.service';
 import { IIssue } from '../issue/issue.model';
+import { IVotingState } from '../voting/voting.model';
 import { WakuNodeService } from '../waku/waku-node.service';
-import { DealerEventsService } from './dealer-events.service';
+import { IMessage, IPlayerVoteMessage, IStateMessage } from '../app/app-waku-message.model';
 
-// TODO: возможно этот класс не нужон
 export class DealerService {
-  private readonly events: DealerEventsService;
-  private readonly gameStateSyncService: GameStateSyncService;
-  constructor(node: WakuNodeService) {
-    this.events = new DealerEventsService(node);
-    this.gameStateSyncService = new GameStateSyncService(this.events);
+  // TODO: get from external default value
+  private votingState: IVotingState = {
+    issue: null,
+    results: null
+  };
 
-    this.gameStateSyncService
-      .init()
-      .enableIntervalSync(10000);
+  constructor(private readonly node: WakuNodeService) { }
+
+  public init(votingState: IVotingState): this {
+    this.votingState = {
+      issue: votingState.issue ? { ...votingState.issue } : null,
+      results: {
+        ...votingState.results
+      }
+    }
+
+    this.node.subscribe(message => {
+      switch (message.type) {
+        case '__player_vote':
+          this.onPlayerVote(message);
+          break;
+        default:
+          break;
+      }
+    });
+
+    return this;
   }
 
-  public startVoting(item: IIssue): void {
-    this.gameStateSyncService.startVoting(item);
+  public enableIntervalSync(timeout: number): this {
+    setInterval(() => this.sendState(), timeout);
+    return this
+  }
+
+  public onMessage(callback: (message: IMessage) => void) {
+    this.node.subscribe(callback);
+  }
+
+  public startVoting(issue: IIssue): void {
+    this.votingState.issue = issue;
+    this.votingState.results = {};
+    this.sendState();
   }
 
   public endVoting(): void {
-    this.gameStateSyncService.endVoting();
+    this.votingState.issue = null;
+    this.votingState.results = null;
+    this.sendState();
   }
 
   public revote(): void {
-    this.gameStateSyncService.revote();
+    this.votingState.results = {};
+    this.sendState();
+  }
+
+  private onPlayerVote(message: IPlayerVoteMessage): void {
+    const voteInProgress = this.votingState.issue && this.votingState.results;
+
+    if (!voteInProgress || message.voteFor !== this.votingState.issue?.id) {
+      return;
+    }
+
+    if (message.voteResult === null) {
+      delete this.votingState.results![message.voteBy];
+    } else {
+      this.votingState.results![message.voteBy] = message.voteResult
+    }
+
+    this.sendState();
+  }
+
+  private sendState(): void {
+    const message: IStateMessage = {
+      type: '__state',
+      state: this.votingState
+    };
+
+    this.node.send(message);
   }
 }

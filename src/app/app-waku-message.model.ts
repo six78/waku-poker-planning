@@ -1,7 +1,7 @@
 import { IPlayer, PlayerName } from '../player/player.model';
 import { IVotingState } from '../voting/voting.model';
 
-export type IMessage = IPlayerMessage | IStateMessage;
+export type IMessage = IPlayerMessage | IStateMessage
 
 export interface IStateMessage {
   type: '__state';
