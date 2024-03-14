@@ -6,6 +6,7 @@ import { AuthorizedUserGuard } from "./user/authorized-user-guard.component";
 import { UserAuth } from "./user/user-auth.component";
 import { CreateOrJoinRoom } from "./room/create-or-join-room.component";
 import { App } from "./App";
+import { RecoilRoot } from "recoil";
 
 const router = createHashRouter([
   {
@@ -35,7 +36,9 @@ const router = createHashRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <StyleProvider hashPriority="high">
-    <RouterProvider router={router} />
-  </StyleProvider>
+  <RecoilRoot>
+    <StyleProvider hashPriority="high">
+      <RouterProvider router={router} />
+    </StyleProvider>
+  </RecoilRoot>
 );

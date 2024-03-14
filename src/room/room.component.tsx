@@ -1,29 +1,31 @@
 import { Header } from "../page-layout/header.component";
 import { Deck } from "../deck/deck.component";
-import { usePlayer } from "../player/player.context";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { DealerControlPanel } from "../dealer/dealer-control-panel.component";
 import { VoteResult } from "../voting/vote-result.component";
-import { useDealer } from "../dealer/dealer.context";
 import { useIssues, useOnlinePlayersList, useVoting } from "../app/app.state";
 import { IIssue } from "../issue/issue.model";
 import { VoteValue } from "../voting/voting.model";
+import { usePlayer } from "../player/player.context";
+import { useDealer } from "../dealer/dealer.context";
 
 export function Room() {
   const player = usePlayer()!;
   const dealer = useDealer();
-  const [revealVotes, setRevealVotes] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, setPlayers] = useOnlinePlayersList();
-
+  const setPlayers = useOnlinePlayersList()[1];
   const [voting, setVoting] = useVoting();
   const [issues, setIssues] = useIssues();
 
+  const [revealVotes, setRevealVotes] = useState(false);
+
+  // TODO:: default voiting state
   useEffect(() => {
     dealer?.init(voting).enableIntervalSync(10000);
+  }, [dealer]);
 
+  useEffect(() => {
     player
-      .onStateChanged(setVoting)
+      ?.onStateChanged(setVoting)
       .enableHeartBeat()
       .onPlayerOnline((player) => {
         setPlayers((players) => {
@@ -33,7 +35,7 @@ export function Room() {
           return [...players, player];
         });
       });
-  }, []);
+  }, [player, setPlayers, setVoting]);
 
   function revote() {
     setRevealVotes(false);
