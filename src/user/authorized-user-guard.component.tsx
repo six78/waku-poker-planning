@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { getUserDataFromLocalStorage } from "./current-user";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, createSearchParams, useParams } from "react-router-dom";
 import { REDIRECT_TO_ROOM_URL_PARAM } from "../app/app.router";
 
 export function AuthorizedUserGuard(props: { children: ReactNode }) {
@@ -8,9 +8,11 @@ export function AuthorizedUserGuard(props: { children: ReactNode }) {
   const user = getUserDataFromLocalStorage();
 
   if (!user) {
-    return (
-      <Navigate to={`/register-user?${REDIRECT_TO_ROOM_URL_PARAM}=${roomId}`} />
+    const params = createSearchParams(
+      roomId ? { [REDIRECT_TO_ROOM_URL_PARAM]: roomId } : {}
     );
+
+    return <Navigate to={`/register-user?${params}`} />;
   }
 
   return <h1>{props.children}</h1>;
