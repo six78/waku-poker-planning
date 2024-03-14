@@ -1,6 +1,6 @@
 import { Header } from "../page-layout/header.component";
 import { Deck } from "../deck/deck.component";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { DealerControlPanel } from "../dealer/dealer-control-panel.component";
 import { VoteResult } from "../voting/vote-result.component";
 import { useIssues, useOnlinePlayersList, useVoting } from "../app/app.state";
@@ -16,11 +16,8 @@ export function Room() {
   const [voting, setVoting] = useVoting();
   const [issues, setIssues] = useIssues();
 
-  const [revealVotes, setRevealVotes] = useState(false);
-
-  // TODO:: default voiting state
   useEffect(() => {
-    dealer?.init(voting).enableIntervalSync(10000);
+    dealer?.init().enableIntervalSync(10000);
   }, [dealer]);
 
   useEffect(() => {
@@ -38,7 +35,6 @@ export function Room() {
   }, [player, setPlayers, setVoting]);
 
   function revote() {
-    setRevealVotes(false);
     dealer?.revote();
   }
 
@@ -47,11 +43,10 @@ export function Room() {
       return;
     }
 
-    setRevealVotes(true);
+    dealer?.reveal();
   }
 
   function submit(result: VoteValue): void {
-    setRevealVotes(false);
     dealer?.endVoting();
     setIssues(
       issues.map((x) => {
@@ -85,7 +80,9 @@ export function Room() {
         )}
       </div>
 
-      {revealVotes && <VoteResult revote={revote} submit={submit}></VoteResult>}
+      {voting.reveal && (
+        <VoteResult revote={revote} submit={submit}></VoteResult>
+      )}
     </>
   );
 }

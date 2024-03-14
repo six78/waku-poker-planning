@@ -13,4 +13,5 @@ export interface IVoteResult {
 export interface IVotingState {
   issue: IIssue | null;
   results: { [key: PlayerId]: VoteValue } | null;
+  reveal: boolean;
 }

@@ -2,24 +2,15 @@ import { IIssue } from '../issue/issue.model';
 import { IVotingState } from '../voting/voting.model';
 import { WakuNodeService } from '../waku/waku-node.service';
 import { IMessage, IPlayerVoteMessage, IStateMessage } from '../app/app-waku-message.model';
+import { DEFAULT_VOTING_STATE } from '../app/app.state';
 
 export class DealerService {
-  // TODO: get from external default value
-  private votingState: IVotingState = {
-    issue: null,
-    results: null
-  };
+  // TODO: tak sebe...
+  private votingState: IVotingState = { ...DEFAULT_VOTING_STATE };
 
   constructor(private readonly node: WakuNodeService) { }
 
-  public init(votingState: IVotingState): this {
-    this.votingState = {
-      issue: votingState.issue ? { ...votingState.issue } : null,
-      results: {
-        ...votingState.results
-      }
-    }
-
+  public init(): this {
     this.node.subscribe(message => {
       switch (message.type) {
         case '__player_vote':
@@ -48,14 +39,25 @@ export class DealerService {
     this.sendState();
   }
 
+  public reveal(): void {
+    if (!this.votingState.issue || !this.votingState.results) {
+      return;
+    }
+
+    this.votingState.reveal = true;
+    this.sendState();
+  }
+
   public endVoting(): void {
-    this.votingState.issue = null;
-    this.votingState.results = null;
+    this.votingState = {
+      ...DEFAULT_VOTING_STATE
+    };
     this.sendState();
   }
 
   public revote(): void {
     this.votingState.results = {};
+    this.votingState.reveal = false;
     this.sendState();
   }
 
