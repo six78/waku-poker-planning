@@ -29,7 +29,6 @@ function IssueVoteComponent(props: { issue: IIssue }) {
   return (
     <div className="flex flex-col h-full">
       <Title level={3}>{issue.name}</Title>
-      <PlayersList />
       <div className="flex-grow overflow-auto">
         {description === null ? (
           <h3>Loading</h3>

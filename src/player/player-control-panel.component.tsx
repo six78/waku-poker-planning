@@ -1,4 +1,4 @@
-import { Card } from "antd";
+import { Card, Divider, Space, Typography } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { usePlayer } from "./player.context";
 import { getFibonacciValues } from "../voting/strategy/fibonacci-strategy";
@@ -7,6 +7,7 @@ import { VoteValue } from "../voting/voting.model";
 import useMessage from "antd/es/message/useMessage";
 import { appConfig } from "../app/app.config";
 import { useVoting } from "../app/app.state";
+import { PlayersList } from "./players-list.component";
 
 const TIMEOUT = 10000;
 
@@ -90,7 +91,11 @@ export function PlayerControlPanel() {
     <Card>
       {contextHolder}
       {voting.issue && (
-        <div>
+        <Space direction="vertical" className="w-full">
+          <Typography.Text>Players votes:</Typography.Text>
+          <PlayersList />
+          <Divider></Divider>
+          <Typography.Text>Vote here:</Typography.Text>
           <div className="grid grid-cols-12">
             {getFibonacciValues().map((x) => (
               <VoteOption
@@ -103,7 +108,7 @@ export function PlayerControlPanel() {
               </VoteOption>
             ))}
           </div>
-        </div>
+        </Space>
       )}
     </Card>
   );
