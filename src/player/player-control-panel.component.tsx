@@ -26,7 +26,6 @@ export function PlayerControlPanel() {
 
   useEffect(() => {
     return () => {
-      console.warn("RESETING TIMER");
       clearTimeoutIfExists();
     };
   }, []);
@@ -42,6 +41,7 @@ export function PlayerControlPanel() {
     }
 
     if (appliedVote === pendingVote) {
+      clearTimeoutIfExists();
       setPendingVote(null);
     }
   }, [appliedVote, pendingVote, revokedVote]);
