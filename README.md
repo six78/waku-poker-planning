@@ -15,6 +15,7 @@ There are two roles in this application: **player** and **dealer**. Player just 
 
 - react
 - waku js
+- tailwind
 - antd ui kit
 - recoil
 - react router
