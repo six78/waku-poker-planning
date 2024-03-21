@@ -1,5 +1,6 @@
 import { IPlayerVoteMessage } from '../app/app-waku-message.model';
 import { IAppState } from '../app/app.state';
+import { Estimation } from '../voting/voting.model';
 import { WakuNodeService } from '../waku/waku-node.service';
 import { IPlayer, PlayerId, PlayerName } from './player.model';
 
@@ -15,7 +16,7 @@ export class PlayerService {
     this.sendPlayerIsOnlineMessage();
   }
 
-  public vote(voteFor: string, voteResult: number | null): void {
+  public vote(voteFor: string, voteResult: Estimation | null): void {
     const message: IPlayerVoteMessage = {
       type: '__player_vote',
       voteBy: this.playerId,

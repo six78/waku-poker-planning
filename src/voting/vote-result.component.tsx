@@ -1,68 +1,41 @@
 import { Button, Modal, Space } from "antd";
 import { IPlayer, PlayerId, PlayerName } from "../player/player.model";
 import { PlayerTag } from "../player/players-list.component";
-import { generateHash } from "../shared/random-hash";
 import { VoteOption } from "./vote-option.component";
-import {
-  IVoteResult,
-  NO_VOTE_LABEL,
-  Estimation,
-  VoteValueOrNoVote,
-  HiddenEstimation,
-} from "./voting.model";
+import { Estimation } from "./voting.model";
 import { useState } from "react";
 import { useDealer } from "../dealer/dealer.context";
 import { useActiveIssue, usePlayersList } from "../app/app.state";
 
-const MOCK = false;
+interface IEstimation {
+  label: string;
+  votedBy: PlayerName[];
+  value: Estimation | undefined;
+}
 
 function calculateResults(
   players: IPlayer[],
-  votes: { [key: PlayerId]: Estimation | HiddenEstimation }
-): IVoteResult {
-  if (MOCK) {
-    return calculateResultsMocked(players, votes);
-  }
+  votes: { [key: PlayerId]: Estimation }
+): IEstimation[] {
+  const map: { [key: string]: IEstimation } = {};
 
-  return players.reduce((result: IVoteResult, player) => {
-    const vote = votes[player.id] || NO_VOTE_LABEL;
-    if (!result[vote]) {
-      result[vote] = [];
+  players.map((player) => {
+    const esimation = votes[player.id];
+    const estimationLabel = esimation || "No votes";
+
+    if (!map[estimationLabel]) {
+      map[estimationLabel] = {
+        label: estimationLabel,
+        votedBy: [],
+        value: esimation,
+      };
     }
-    result[vote]!.push(player.name);
-    return result;
-  }, {} as IVoteResult);
-}
 
-function calculateResultsMocked(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _players: IPlayer[],
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _votes: { [key: PlayerId]: Estimation | HiddenEstimation }
-): IVoteResult {
-  return {
-    "8": [
-      generateHash() + generateHash(),
-      generateHash() + generateHash() + generateHash(),
-      generateHash() + generateHash() + generateHash(),
-      generateHash() + generateHash() + generateHash(),
-      generateHash() + generateHash() + generateHash(),
-      generateHash() + generateHash() + generateHash(),
-      generateHash() + generateHash() + generateHash(),
-      generateHash(),
-      generateHash(),
-      generateHash(),
-      generateHash(),
-      generateHash(),
-      generateHash(),
-      generateHash(),
-      generateHash(),
-      generateHash(),
-      generateHash(),
-    ],
-    "13": ["dsfgsdfg", "alsdsa", "asdasd", "sdasdasd"],
-    [NO_VOTE_LABEL]: ["sdfgsdfg"],
-  };
+    map[estimationLabel].votedBy.push(player.name);
+  });
+
+  // TODO: think about sorting
+  return Object.values(map);
 }
 
 export function VoteResult() {
@@ -77,15 +50,15 @@ export function VoteResult() {
     throw new Error("");
   }
 
-  function handleVoteClick(vote: VoteValueOrNoVote): void {
-    if (!dealer || vote === NO_VOTE_LABEL) {
+  function handleEstimationClick(estimation: IEstimation): void {
+    if (!dealer || !estimation.value) {
       return;
     }
 
-    setResult(result !== vote ? vote : null);
+    setResult(result !== estimation.value ? estimation.value : null);
   }
 
-  const votes = calculateResults(players, issue.votes);
+  const estimations = calculateResults(players, issue.votes);
 
   return (
     <Modal
@@ -105,26 +78,25 @@ export function VoteResult() {
         </Space>
       }
     >
-      {Object.entries(votes).map((entry) => {
-        const vote = entry[0] as VoteValueOrNoVote;
-        const players = entry[1] as PlayerName[];
-
+      {estimations.map((esimation) => {
         return (
-          <div key={vote} className="flex items-center mb-4">
+          <div key={esimation.label} className="flex items-center mb-4">
             <VoteOption
               className="flex-shrink-0"
-              active={vote === result}
-              key={vote}
-              onClick={handleVoteClick.bind(undefined, vote)}
+              active={
+                esimation.value !== undefined && esimation.value === result
+              }
+              key={esimation.label}
+              onClick={handleEstimationClick.bind(undefined, esimation)}
               showLoader={false}
             >
-              {vote}
+              {esimation.label}
             </VoteOption>
             <div className="ml-4">
               <Space wrap={true}>
-                {players.map((player) => (
-                  <PlayerTag key={player} color="blue">
-                    {player}
+                {esimation.votedBy.map((playerName) => (
+                  <PlayerTag key={playerName} color="blue">
+                    {playerName}
                   </PlayerTag>
                 ))}
               </Space>

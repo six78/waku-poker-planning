@@ -73,6 +73,8 @@ export class DealerService {
       activeIssue.votes = {};
       this.sendStateToNetwork();
     }
+
+    this.state.revealResults = false;
   }
 
   public addIssue(issue: IIssue): void {
