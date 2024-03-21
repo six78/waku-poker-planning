@@ -1,31 +1,47 @@
-import { atom, useRecoilState } from 'recoil';
+import { atom, useRecoilState, useRecoilValue } from 'recoil';
 import { IPlayer } from '../player/player.model';
-import { IVotingState } from '../voting/voting.model';
-import { IIssue } from '../issue/issue.model';
+import { IIssue, IssueId } from '../issue/issue.model';
 
-export const DEFAULT_VOTING_STATE: IVotingState = {
-  issue: null,
-  results: null,
-  reveal: false
+export interface IAppState {
+  players: IPlayer[];
+  issues: IIssue[];
+  activeIssue: IssueId | null;
+  revealResults: boolean;
 }
 
-const playersOnline = atom<IPlayer[]>({
-  key: 'onlinePlayersList',
-  default: []
+export function createDefaultAppState(): IAppState {
+  return {
+    players: [],
+    issues: [],
+    activeIssue: null,
+    revealResults: false
+  }
+}
+
+const appState = atom<IAppState>({
+  key: 'appState',
+  default: createDefaultAppState()
 });
 
-export const useOnlinePlayersList = () => useRecoilState(playersOnline);
+// TODO: bad naming
+export const useAppState = () => useRecoilValue(appState);
+export const useUpdateAppState = () => useRecoilState(appState)[1];
 
-const voting = atom<IVotingState>({
-  key: 'voting',
-  default: DEFAULT_VOTING_STATE
-})
+export const useIssuesList = () => {
+  const { issues } = useAppState();
+  return issues;
+}
 
-export const useVoting = () => useRecoilState(voting);
+export const useActiveIssue = () => {
+  const { issues, activeIssue } = useAppState();
+  if (!activeIssue) {
+    return null;
+  }
 
-const issuesList = atom<IIssue[]>({
-  key: 'issuesList',
-  default: []
-})
+  return issues.find(issue => issue.id === activeIssue) || null;
+}
 
-export const useIssues = () => useRecoilState(issuesList);
+export const usePlayersList = () => {
+  const { players } = useAppState();
+  return players;
+}

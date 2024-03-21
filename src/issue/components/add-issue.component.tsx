@@ -1,11 +1,12 @@
 import { Button, Input, Space } from "antd";
 import { useState } from "react";
-import { IIssue } from "../../issue/issue.model";
-import { createIssueFromString } from "../../issue/issue-parsing.service";
+import { IIssue } from "../issue.model";
+import { createIssueFromString } from "../issue-parsing.service";
 
 export function AddIssue(props: { addIssue: (issue: IIssue) => void }) {
+  // TODO: display issue name
   const [value, setValue] = useState("");
-  const [loading, setLoading] = useState(false);
+  //  const [loading, setLoading] = useState(false);
 
   function onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -14,18 +15,20 @@ export function AddIssue(props: { addIssue: (issue: IIssue) => void }) {
   }
 
   function onAdd(): void {
-    setLoading(true);
+    //    setLoading(true);
     const issueName = value.trim();
 
     if (!issueName) {
       return;
     }
 
-    createIssueFromString(issueName).then((x) => {
-      setLoading(false);
-      setValue("");
-      props.addIssue(x);
-    });
+    setValue("");
+    props.addIssue(createIssueFromString(issueName));
+
+    //     createIssueFromString(issueName).then((x) => {
+    // //      setLoading(false);
+
+    //     });
   }
 
   return (
@@ -38,12 +41,12 @@ export function AddIssue(props: { addIssue: (issue: IIssue) => void }) {
       ></Input>
       <Button
         disabled={value.length === 0}
-        loading={loading}
+        //loading={loading}
         type="primary"
         style={{ width: "4rem" }}
         onClick={onAdd}
       >
-        {loading ? "" : "Add"}
+        {/* {loading ? "" : "Add"} */} Add
       </Button>
     </Space.Compact>
   );

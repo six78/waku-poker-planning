@@ -1,66 +1,23 @@
 import { Header } from "../page-layout/header.component";
 import { Deck } from "../deck/deck.component";
 import { useEffect } from "react";
-import { DealerControlPanel } from "../dealer/dealer-control-panel.component";
 import { VoteResult } from "../voting/vote-result.component";
-import { useIssues, useOnlinePlayersList, useVoting } from "../app/app.state";
-import { IIssue } from "../issue/issue.model";
-import { VoteValue } from "../voting/voting.model";
 import { usePlayer } from "../player/player.context";
 import { useDealer } from "../dealer/dealer.context";
+import { Flex } from "antd";
+import { AddIssue } from "../issue/components/add-issue.component";
+import { IssueList } from "../issue/components/issue-list.component";
+import { useAppState, useUpdateAppState } from "../app/app.state";
 
 export function Room() {
   const player = usePlayer()!;
   const dealer = useDealer();
-  const setPlayers = useOnlinePlayersList()[1];
-  const [voting, setVoting] = useVoting();
-  const [issues, setIssues] = useIssues();
+  const appState = useAppState();
+  const updateAppState = useUpdateAppState();
 
   useEffect(() => {
-    dealer?.init().enableIntervalSync(10000);
-  }, [dealer]);
-
-  useEffect(() => {
-    player
-      ?.onStateChanged(setVoting)
-      .enableHeartBeat()
-      .onPlayerOnline((player) => {
-        setPlayers((players) => {
-          if (players.some((participant) => participant.id === player.id)) {
-            return players;
-          }
-          return [...players, player];
-        });
-      });
-  }, [player, setPlayers, setVoting]);
-
-  function revote() {
-    dealer?.revote();
-  }
-
-  function reveal(issue: IIssue): void {
-    if (issue.id !== voting.issue?.id) {
-      return;
-    }
-
-    dealer?.reveal();
-  }
-
-  function submit(result: VoteValue): void {
-    dealer?.endVoting();
-    setIssues(
-      issues.map((x) => {
-        if (x.id === voting.issue?.id) {
-          return {
-            ...x,
-            result: `${result}`,
-          };
-        }
-
-        return x;
-      })
-    );
-  }
+    player.onStateChanged(updateAppState).enableHeartBeat();
+  }, [player, updateAppState]);
 
   return (
     <>
@@ -73,16 +30,21 @@ export function Room() {
             <Deck></Deck>
           </div>
         </div>
-        {dealer && (
-          <div className="w-96 border-l border-gray-300">
-            <DealerControlPanel revealVotes={reveal} />
-          </div>
-        )}
+        <div className="w-96 border-l border-gray-300">
+          <Flex
+            vertical
+            gap="large"
+            className="w-full h-full bg-white py-3 px-6"
+          >
+            {dealer && (
+              <AddIssue addIssue={(issue) => dealer?.addIssue(issue)} />
+            )}
+            <IssueList></IssueList>
+          </Flex>
+        </div>
       </div>
 
-      {voting.reveal && (
-        <VoteResult revote={revote} submit={submit}></VoteResult>
-      )}
+      {appState.revealResults && <VoteResult />}
     </>
   );
 }

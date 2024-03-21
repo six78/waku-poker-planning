@@ -1,57 +1,59 @@
-import { IVotingState } from '../voting/voting.model';
+import { IPlayerVoteMessage } from '../app/app-waku-message.model';
+import { IAppState } from '../app/app.state';
 import { WakuNodeService } from '../waku/waku-node.service';
-import { PlayerEventsService } from './player-events.service';
 import { IPlayer, PlayerId, PlayerName } from './player.model';
+
 
 export class PlayerService {
   public readonly playerId: PlayerId;
   public readonly playerName: PlayerName;
-  /**
-   * @deprecated
-   * TODO: remove isDealer and call useDealer() instead
-   */
-  public readonly isDealer: boolean;
-  private readonly events: PlayerEventsService;
 
-  constructor(node: WakuNodeService, player: IPlayer) {
+  constructor(private readonly node: WakuNodeService, player: IPlayer) {
     this.playerId = player.id;
     this.playerName = player.name;
-    this.isDealer = player.isDealer;
-    this.events = new PlayerEventsService(node);
+
+    this.sendPlayerIsOnlineMessage();
   }
 
   public vote(voteFor: string, voteResult: number | null): void {
-    this.events.sendVote({
+    const message: IPlayerVoteMessage = {
+      type: '__player_vote',
       voteBy: this.playerId,
       voteFor,
       voteResult
-    })
+    };
+
+    this.node.send(message);
   }
 
-  public onStateChanged(callback: (state: IVotingState) => void): this {
-    this.events.onStateChanged(callback);
+  public onStateChanged(callback: (state: IAppState) => void): this {
+    this.node.subscribe(message => {
+      if (message.type === '__state') {
+        console.log('trying apply state', message.state);
+        callback(message.state);
+      }
+    })
+
     return this;
   }
 
-  public onPlayerOnline(callback: (player: IPlayer) => void): void {
-    this.events.onPlayerOnline(callback);
-  }
-
   public enableHeartBeat(): this {
-    const player: IPlayer = {
-      id: this.playerId,
-      name: this.playerName,
-      isDealer: this.isDealer
-    }
-
-    this.events.playerIsOnline(player);
-
     setInterval(() => {
-      this.events.playerIsOnline(player);
+      this.sendPlayerIsOnlineMessage()
     }, 10 * 1000);
 
     return this;
   }
 
+  private sendPlayerIsOnlineMessage(): void {
+    const player: IPlayer = {
+      id: this.playerId,
+      name: this.playerName,
+    }
 
+    this.node.send({
+      type: '__player_online',
+      player,
+    });
+  }
 }

@@ -14,7 +14,7 @@ import { DealerService } from "./dealer/dealer.service";
 import { Room } from "./room/room.component";
 import { createContentTopic } from "./app/app.const";
 import { isCurrentUserDealerForRoom } from "./dealer/dealer-resolver";
-import { RecoilRoot } from "recoil";
+import { useUpdateAppState } from "./app/app.state";
 
 export function App() {
   const { id: roomId } = useParams();
@@ -29,6 +29,7 @@ export function App() {
   }
 
   const isDealer = isCurrentUserDealerForRoom(roomId);
+  const updateAppState = useUpdateAppState();
 
   const [node, setNode] = useState<WakuNodeService | null>(null);
   const [playerService, setPlayerService] = useState<PlayerService | null>(
@@ -45,19 +46,17 @@ export function App() {
       }
 
       setDealerService(isDealer ? new DealerService(node) : null);
-      setPlayerService(new PlayerService(node, { ...user, isDealer }));
+      setPlayerService(new PlayerService(node, user));
       setNode(node);
     });
-  }, [roomId, user, isDealer]);
+  }, [roomId, user, isDealer, updateAppState]);
 
   return node ? (
-    <RecoilRoot>
-      <PlayerContext.Provider value={playerService}>
-        <DealerServiceContext.Provider value={dealerService}>
-          <Room />
-        </DealerServiceContext.Provider>
-      </PlayerContext.Provider>
-    </RecoilRoot>
+    <PlayerContext.Provider value={playerService}>
+      <DealerServiceContext.Provider value={dealerService}>
+        <Room />
+      </DealerServiceContext.Provider>
+    </PlayerContext.Provider>
   ) : (
     <div className="h-screen w-screen flex justify-center items-center">
       <Spin size="large" />

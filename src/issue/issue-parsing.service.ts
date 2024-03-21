@@ -12,22 +12,15 @@ async function getRemoteIssue(issueUrl: string): Promise<IRemoteIssue | null> {
 }
 
 
-export async function createIssueFromString(data: string): Promise<IIssue> {
+export function createIssueFromString(data: string): IIssue {
+  // TODO: display issue title in card
+
   const issue: IIssue = {
     id: generateHash(),
-    name: data
+    titleOrUrl: data,
+    result: null,
+    votes: {}
   };
-
-  if (!isUrl(data)) {
-    return issue;
-  }
-
-  issue.url = data;
-  const issueDetails = await getRemoteIssue(issue.url);
-
-  if (issueDetails) {
-    issue.name = issueDetails.name
-  }
 
   return issue;
 }

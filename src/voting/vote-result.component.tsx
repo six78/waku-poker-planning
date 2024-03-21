@@ -6,21 +6,19 @@ import { VoteOption } from "./vote-option.component";
 import {
   IVoteResult,
   NO_VOTE_LABEL,
-  VoteValue,
+  Estimation,
   VoteValueOrNoVote,
+  HiddenEstimation,
 } from "./voting.model";
 import { useState } from "react";
 import { useDealer } from "../dealer/dealer.context";
-import {
-  useOnlinePlayersList as useOnlinePlayersList,
-  useVoting,
-} from "../app/app.state";
+import { useActiveIssue, usePlayersList } from "../app/app.state";
 
 const MOCK = false;
 
 function calculateResults(
   players: IPlayer[],
-  votes: { [key: PlayerId]: VoteValue }
+  votes: { [key: PlayerId]: Estimation | HiddenEstimation }
 ): IVoteResult {
   if (MOCK) {
     return calculateResultsMocked(players, votes);
@@ -40,7 +38,7 @@ function calculateResultsMocked(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _players: IPlayer[],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _votes: { [key: PlayerId]: VoteValue }
+  _votes: { [key: PlayerId]: Estimation | HiddenEstimation }
 ): IVoteResult {
   return {
     "8": [
@@ -67,17 +65,14 @@ function calculateResultsMocked(
   };
 }
 
-export function VoteResult(props: {
-  revote: () => void;
-  submit: (value: VoteValue) => void;
-}) {
-  const [players] = useOnlinePlayersList();
-  const [voting] = useVoting();
-  const results = voting.results;
-  const [result, setResult] = useState<VoteValue | null>(null);
+export function VoteResult() {
   const dealer = useDealer();
+  const players = usePlayersList();
+  const issue = useActiveIssue();
 
-  if (!results) {
+  const [result, setResult] = useState<Estimation | null>(null);
+
+  if (!issue) {
     // TODO:
     throw new Error("");
   }
@@ -90,12 +85,7 @@ export function VoteResult(props: {
     setResult(result !== vote ? vote : null);
   }
 
-  function handleRevoteClick(): void {
-    props.revote();
-  }
-
-  const votes = calculateResults(players, results);
-  console.log(votes);
+  const votes = calculateResults(players, issue.votes);
 
   return (
     <Modal
@@ -104,11 +94,11 @@ export function VoteResult(props: {
       closable={false}
       footer={
         <Space>
-          {dealer && <Button onClick={handleRevoteClick}>Revote</Button>}
+          {dealer && <Button onClick={() => dealer.revote()}>Revote</Button>}
           <Button
             type="primary"
             disabled={!result}
-            onClick={() => props.submit(result!)}
+            onClick={() => dealer?.submitResult(result!)}
           >
             Submit
           </Button>

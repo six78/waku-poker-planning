@@ -1,7 +1,7 @@
 import { Space, Tag } from "antd";
 import { usePlayer } from "./player.context";
 import { ReactNode } from "react";
-import { useOnlinePlayersList, useVoting } from "../app/app.state";
+import { useActiveIssue, useAppState } from "../app/app.state";
 
 export function PlayerTag(props: {
   children: ReactNode;
@@ -18,17 +18,18 @@ export function PlayerTag(props: {
 export function PlayersList() {
   // TODO: to pure component
   const currentPlayer = usePlayer();
-  const [voting] = useVoting();
-  const [players] = useOnlinePlayersList();
+  const { players } = useAppState();
+  const activeIssue = useActiveIssue();
 
   return (
     <Space>
       {players.map((player) => {
-        const vote = (voting.results || {})[player.id];
+        const playerEstimation = (activeIssue?.votes || {})[player.id];
+
         return (
           <PlayerTag
             key={player.id}
-            color={vote ? "green" : "blue"}
+            color={playerEstimation ? "green" : "blue"}
             isCurrentPlayer={player.id === currentPlayer?.playerId}
           >
             {player.name}

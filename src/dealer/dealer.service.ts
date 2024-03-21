@@ -1,88 +1,117 @@
 import { IIssue } from '../issue/issue.model';
-import { IVotingState } from '../voting/voting.model';
 import { WakuNodeService } from '../waku/waku-node.service';
-import { IMessage, IPlayerVoteMessage, IStateMessage } from '../app/app-waku-message.model';
-import { DEFAULT_VOTING_STATE } from '../app/app.state';
+import { IPlayerOnlineMessage, IPlayerVoteMessage } from '../app/app-waku-message.model';
+import { IAppState, createDefaultAppState } from '../app/app.state';
+import { Estimation } from '../voting/voting.model';
+
+
+// TODO: why this decorator not working?
+// function NetworkSync(target: DealerService, _propertyKey: string, descriptor: PropertyDescriptor) {
+//   const originalMethod = descriptor.value;
+
+//   descriptor.value = function (...args: unknown[]) {
+//     console.log('CALLING', descriptor);
+//     const result = originalMethod.apply(target, args);
+//     console.log('after function call');
+//     // target.sendStateToNetwork();
+//     return result;
+//   };
+// }
+
+
 
 export class DealerService {
-  // TODO: tak sebe...
-  private votingState: IVotingState = { ...DEFAULT_VOTING_STATE };
+  // TODO: think how to avoid state duplication
+  private state: IAppState = createDefaultAppState();
 
-  constructor(private readonly node: WakuNodeService) { }
-
-  public init(): this {
+  constructor(private readonly node: WakuNodeService) {
     this.node.subscribe(message => {
       switch (message.type) {
-        case '__player_vote':
-          this.onPlayerVote(message);
+        case '__player_online':
+          this.onPlayerOnline(message);
           break;
-        default:
+        case '__player_vote':
+          this.onPlayerVoted(message);
           break;
       }
-    });
-
-    return this;
-  }
-
-  public enableIntervalSync(timeout: number): this {
-    setInterval(() => this.sendState(), timeout);
-    return this
-  }
-
-  public onMessage(callback: (message: IMessage) => void) {
-    this.node.subscribe(callback);
+    })
   }
 
   public startVoting(issue: IIssue): void {
-    this.votingState.issue = issue;
-    this.votingState.results = {};
-    this.sendState();
+    this.state.activeIssue = issue.id;
+    this.sendStateToNetwork();
   }
 
   public reveal(): void {
-    if (!this.votingState.issue || !this.votingState.results) {
+    if (!this.state.activeIssue) {
       return;
     }
 
-    this.votingState.reveal = true;
-    this.sendState();
+    this.state.revealResults = true;
+    this.sendStateToNetwork();
+
   }
 
-  public endVoting(): void {
-    this.votingState = {
-      ...DEFAULT_VOTING_STATE
-    };
-    this.sendState();
+  public submitResult(result: Estimation): void {
+    const activeIssue = this.state.issues.find(x => x.id === this.state.activeIssue);
+
+    if (activeIssue) {
+      activeIssue.result = result;
+    }
+
+    this.state.revealResults = false;
+    this.state.activeIssue = null;
+    this.sendStateToNetwork();
+
   }
 
   public revote(): void {
-    this.votingState.results = {};
-    this.votingState.reveal = false;
-    this.sendState();
+    const activeIssue = this.state.issues.find(x => x.id === this.state.activeIssue);
+
+    if (activeIssue) {
+      activeIssue.result = null;
+      activeIssue.votes = {};
+      this.sendStateToNetwork();
+    }
   }
 
-  private onPlayerVote(message: IPlayerVoteMessage): void {
-    const voteInProgress = this.votingState.issue && this.votingState.results;
+  public addIssue(issue: IIssue): void {
+    this.state.issues.push(issue);
+    this.sendStateToNetwork();
+  }
 
-    if (!voteInProgress || message.voteFor !== this.votingState.issue?.id) {
+  public sendStateToNetwork(): void {
+    this.node.send({
+      type: '__state',
+      state: this.state
+    })
+  }
+
+  private onPlayerOnline(message: IPlayerOnlineMessage): void {
+    const players = this.state.players;
+
+    if (players.some((player) => player.id === message.player.id)) {
+      return;
+    }
+
+    this.state.players.push(message.player);
+    this.sendStateToNetwork();
+  }
+
+  private onPlayerVoted(message: IPlayerVoteMessage): void {
+    const activeIssue = this.state.issues.find(x => x.id === this.state.activeIssue);
+
+    if (!activeIssue || message.voteFor !== activeIssue.id) {
       return;
     }
 
     if (message.voteResult === null) {
-      delete this.votingState.results![message.voteBy];
+      delete activeIssue.votes[message.voteBy];
     } else {
-      this.votingState.results![message.voteBy] = message.voteResult
+      activeIssue.votes[message.voteBy] = message.voteResult;
     }
 
-    this.sendState();
+    this.sendStateToNetwork();
   }
 
-  private sendState(): void {
-    const message: IStateMessage = {
-      type: '__state',
-      state: this.votingState
-    };
-
-    this.node.send(message);
-  }
 }

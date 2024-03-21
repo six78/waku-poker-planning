@@ -1,17 +1,16 @@
-import { IIssue } from '../issue/issue.model';
-import { PlayerId, PlayerName } from '../player/player.model';
 
+import { PlayerName } from '../player/player.model';
+
+// TODO: avoid NO_VOTE_LABEL
 export const NO_VOTE_LABEL = 'No vote';
-export type VoteValue = number;
-export type VoteValueOrNoVote = VoteValue | typeof NO_VOTE_LABEL;
+// TODO: rename to Estimation?
+export type Estimation = number;
+export type HiddenEstimation = '';
+
+export type VoteValueOrNoVote = Estimation | typeof NO_VOTE_LABEL;
 
 export interface IVoteResult {
   [NO_VOTE_LABEL]?: PlayerName[];
-  [key: VoteValue]: PlayerName[];
+  [key: Estimation]: PlayerName[];
 }
 
-export interface IVotingState {
-  issue: IIssue | null;
-  results: { [key: PlayerId]: VoteValue } | null;
-  reveal: boolean;
-}

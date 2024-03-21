@@ -3,9 +3,9 @@ import { PlayerControlPanel } from "../player/player-control-panel.component";
 import Markdown from "react-markdown";
 import { PlayersList } from "../player/players-list.component";
 import { IIssue } from "../issue/issue.model";
-import { useVoting } from "../app/app.state";
 import { useEffect, useState } from "react";
 import { tryGetIssueDescription } from "../issue/issue-parsing.service";
+import { useActiveIssue } from "../app/app.state";
 
 function NoVoteItem() {
   return (
@@ -21,14 +21,14 @@ function IssueVoteComponent(props: { issue: IIssue }) {
   const [description, setDescription] = useState<string | null>(null);
 
   useEffect(() => {
-    if (issue.url) {
-      tryGetIssueDescription(issue.url).then((x) => setDescription(x));
-    }
+    tryGetIssueDescription(issue.titleOrUrl).then((x) =>
+      setDescription(x || "Issue has no description")
+    );
   }, [issue]);
 
   return (
     <div className="flex flex-col h-full">
-      <Title level={3}>{issue.name}</Title>
+      <Title level={3}>{issue.titleOrUrl}</Title>
       <div className="flex-grow overflow-auto">
         {description === null ? (
           <h3>Loading</h3>
@@ -36,19 +36,19 @@ function IssueVoteComponent(props: { issue: IIssue }) {
           <Markdown>{description}</Markdown>
         )}
       </div>
-      <PlayerControlPanel></PlayerControlPanel>
+      <PlayerControlPanel issue={issue}></PlayerControlPanel>
     </div>
   );
 }
 
 export function Deck() {
-  const [voting] = useVoting();
+  const activeIssue = useActiveIssue();
 
   return (
     <div className="bg-white text-gray-900 h-full w-full p-6">
       <div className="h-full w-full">
-        {voting.issue ? (
-          <IssueVoteComponent issue={voting.issue} />
+        {activeIssue ? (
+          <IssueVoteComponent issue={activeIssue} />
         ) : (
           <NoVoteItem />
         )}

@@ -8,28 +8,27 @@ import {
 import Card from "antd/es/card/Card";
 import Meta from "antd/es/card/Meta";
 import { ReactElement } from "react";
-import { useDealer } from "../dealer.context";
+import { useDealer } from "../../dealer/dealer.context";
 import { IPlayer } from "../../player/player.model";
-import { useOnlinePlayersList, useVoting } from "../../app/app.state";
-import { IIssue } from "../../issue/issue.model";
-import { IVotingState } from "../../voting/voting.model";
+import {
+  useActiveIssue,
+  useIssuesList,
+  usePlayersList,
+} from "../../app/app.state";
+import { IIssue } from "../issue.model";
+import { isUrl } from "../../shared/url";
 
 function getDescription(
   issue: IIssue,
-  voting: IVotingState,
+  isVoteInProgress: boolean,
   players: IPlayer[]
 ): ReactElement {
-  const { issue: currentVoteItem, results: tempVoteResults } = voting;
-  const isCurrentVoteItem = currentVoteItem?.id === issue.id;
-
-  if (isCurrentVoteItem) {
-    const completedVotesCount = Object.keys(tempVoteResults || {}).length;
+  if (isVoteInProgress) {
+    const completedVotesCount = Object.keys(issue.votes || {}).length;
     const totalVotes = players.length;
 
     const percent = (100 * completedVotesCount) / totalVotes;
-    const text = `${Object.keys(tempVoteResults || {}).length} of ${
-      players.length
-    } player(s) voted`;
+    const text = `${completedVotesCount} of ${players.length} player(s) voted`;
     return (
       <Tooltip placement="top" title={text}>
         <Progress
@@ -44,17 +43,13 @@ function getDescription(
   return <>{issue.result || "No vote yet"}</>;
 }
 
-export function IssueList(props: { issues: IIssue[]; reveal: () => void }) {
-  const [players] = useOnlinePlayersList();
-  const [game] = useVoting();
-  const issue = game.issue;
+export function IssueList() {
   const dealer = useDealer();
+  const players = usePlayersList();
+  const issues = useIssuesList();
+  const activeIssue = useActiveIssue();
 
-  function startVoting(item: IIssue): void {
-    dealer?.startVoting(item);
-  }
-
-  if (!props.issues.length) {
+  if (!issues.length) {
     return (
       <div className="flex-grow flex-center">
         <Empty
@@ -72,27 +67,35 @@ export function IssueList(props: { issues: IIssue[]; reveal: () => void }) {
       size="middle"
       style={{ display: "flex" }}
     >
-      {props.issues.map((x) => (
+      {issues.map((x) => (
         <Card
           key={x.id}
-          actions={[
-            <DeleteOutlined key="setting" />,
-            <>
-              {issue?.id === x.id ? (
-                <Button onClick={props.reveal} type="primary" key="edit">
-                  End voting
-                </Button>
-              ) : (
-                <Button
-                  onClick={startVoting.bind(undefined, x)}
-                  type="primary"
-                  key="edit"
-                >
-                  Run
-                </Button>
-              )}
-            </>,
-          ]}
+          actions={
+            dealer
+              ? [
+                  <DeleteOutlined key="setting" />,
+                  <>
+                    {activeIssue?.id === x.id ? (
+                      <Button
+                        onClick={() => dealer?.reveal()}
+                        type="primary"
+                        key="edit"
+                      >
+                        {dealer ? "End voting" : "Voting in progress"}
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => dealer?.startVoting(x)}
+                        type="primary"
+                        key="edit"
+                      >
+                        Run
+                      </Button>
+                    )}
+                  </>,
+                ]
+              : undefined
+          }
         >
           <Meta
             avatar={
@@ -104,19 +107,19 @@ export function IssueList(props: { issues: IIssue[]; reveal: () => void }) {
             }
             title={
               <div className="flex justify-between">
-                <Tooltip placement="top" title={x.name}>
+                <Tooltip placement="top" title={x.titleOrUrl}>
                   <span className="overflow-hidden text-ellipsis">
-                    {x.name}
+                    {x.titleOrUrl}
                   </span>
                 </Tooltip>
-                {x.url && (
-                  <a href={x.url} target="_blank">
+                {isUrl(x.titleOrUrl) && (
+                  <a href={x.titleOrUrl} target="_blank">
                     <ExportOutlined />
                   </a>
                 )}
               </div>
             }
-            description={getDescription(x, game, players)}
+            description={getDescription(x, activeIssue?.id === x.id, players)}
           />
         </Card>
       ))}

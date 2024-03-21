@@ -3,24 +3,24 @@ import { useEffect, useRef, useState } from "react";
 import { usePlayer } from "./player.context";
 import { getFibonacciValues } from "../voting/strategy/fibonacci-strategy";
 import { VoteOption } from "../voting/vote-option.component";
-import { VoteValue } from "../voting/voting.model";
+import { Estimation } from "../voting/voting.model";
 import useMessage from "antd/es/message/useMessage";
 import { appConfig } from "../app/app.config";
-import { useVoting } from "../app/app.state";
 import { PlayersList } from "./players-list.component";
+import { IIssue } from "../issue/issue.model";
 
 const TIMEOUT = 10000;
 
-export function PlayerControlPanel() {
+export function PlayerControlPanel(props: { issue: IIssue }) {
+  const { issue } = props;
   const [messageApi, contextHolder] = useMessage();
   const player = usePlayer()!;
-  const [voting] = useVoting();
 
   // Player vote stored in the game state
-  const appliedVote = (voting.results || {})[player.playerId];
+  const appliedVote = (issue.votes || {})[player.playerId];
   // Player vote on player's device that didn't reach the game state
-  const [pendingVote, setPendingVote] = useState<VoteValue | null>(null);
-  const [revokedVote, setRevokedVote] = useState<VoteValue | null>(null);
+  const [pendingVote, setPendingVote] = useState<Estimation | null>(null);
+  const [revokedVote, setRevokedVote] = useState<Estimation | null>(null);
 
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
 
@@ -46,20 +46,20 @@ export function PlayerControlPanel() {
     }
   }, [appliedVote, pendingVote, revokedVote]);
 
-  function submitVote(value: VoteValue): void {
+  function submitVote(value: Estimation): void {
     setRevokedVote(null);
     setPendingVote(value);
     sendVote(value);
   }
 
-  function revokeVote(value: VoteValue): void {
+  function revokeVote(value: Estimation): void {
     setRevokedVote(value);
     setPendingVote(value);
     sendVote(null);
   }
 
-  function sendVote(value: VoteValue | null): void {
-    player.vote(voting.issue!.id, value);
+  function sendVote(value: Estimation | null): void {
+    player.vote(issue.id, value);
     clearTimeoutIfExists();
     timeoutId.current = setTimeout(() => {
       messageApi.error(
@@ -71,7 +71,7 @@ export function PlayerControlPanel() {
     }, TIMEOUT);
   }
 
-  function handleClick(value: VoteValue): void {
+  function handleClick(value: Estimation): void {
     if (pendingVote) {
       // There are many problems with event races
       return;
@@ -90,7 +90,7 @@ export function PlayerControlPanel() {
   return (
     <Card>
       {contextHolder}
-      {voting.issue && (
+      {issue && (
         <Space direction="vertical" className="w-full">
           <Typography.Text>Players votes:</Typography.Text>
           <PlayersList />

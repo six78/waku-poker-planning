@@ -1,6 +1,6 @@
 import { IPlayer, PlayerName } from '../player/player.model';
-import { generateGuid } from '../shared/guid';
 import { getFromLocalStorage, saveToLocalStorage } from '../shared/local-storage';
+import { generateHash } from '../shared/random-hash';
 
 const STORAGE_KEY = 'USER';
 
@@ -10,10 +10,8 @@ export function getUserDataFromLocalStorage(): IPlayer | null {
 
 export function saveUserToLocalStorage(name: PlayerName): void {
   const user: IPlayer = {
-    id: generateGuid(),
+    id: generateHash(),
     name,
-    // TODO: do not store isDealer 
-    isDealer: false
   }
 
   saveToLocalStorage(STORAGE_KEY, user)

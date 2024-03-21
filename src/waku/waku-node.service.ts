@@ -88,7 +88,7 @@ export class WakuNodeService {
     private readonly node: IWakuLightNode,
     contentTopic: string,
   ) {
-    this.encoder = createEncoder({ contentTopic, pubsubTopic: PUBSUB_TOPIC });
+    this.encoder = createEncoder({ contentTopic, pubsubTopic: PUBSUB_TOPIC, ephemeral: true });
     this.decoder = createDecoder(contentTopic, PUBSUB_TOPIC);
 
     this.initSubscription();
@@ -96,6 +96,7 @@ export class WakuNodeService {
 
   private async initSubscription(): Promise<void> {
     await this.node.filter.subscribe([this.decoder], rawMessage => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const message = JSON.parse(this.decodeUtf8((rawMessage as any).proto.payload)) as IMessage;
       const messagesToLog = logLevel.get(appConfig.logLevel) || [];
       if (messagesToLog.includes(message.type)) {
