@@ -3,7 +3,7 @@
 > [!CAUTION]
 > This app is a **proof of concept**, it's unstable and is not ready for production usage
 
-You can **[try it here](https://six78.github.io/waku-poker-planing/)**
+You can **[try it here](https://six78.github.io/waku-poker-planning/)**
 
 ### Description
 
