@@ -1,9 +1,11 @@
 import { IIssue } from '../issue/issue.model';
 import { WakuNodeService } from '../waku/waku-node.service';
 import { IPlayerOnlineMessage, IPlayerVoteMessage } from '../app/app-waku-message.model';
-import { IAppState, createDefaultAppState } from '../app/app.state';
+import { IAppState } from '../app/app.state';
 import { Estimation } from '../voting/voting.model';
 import { toArray, toDictionary } from '../shared/object';
+import { RoomId } from '../room/room.model';
+import { getRoomState, saveRoomState } from './dealer-resolver';
 
 
 // TODO: why this decorator not working?
@@ -22,10 +24,10 @@ import { toArray, toDictionary } from '../shared/object';
 
 
 export class DealerService {
-  // TODO: think how to avoid state duplication
-  private state: IAppState = createDefaultAppState();
+  private state: IAppState;
+  constructor(private readonly node: WakuNodeService, private readonly roomId: RoomId) {
+    this.state = getRoomState(roomId);
 
-  constructor(private readonly node: WakuNodeService) {
     this.node.subscribe(message => {
       switch (message.type) {
         case '__player_online':
@@ -37,6 +39,7 @@ export class DealerService {
       }
     })
 
+    this.sendStateToNetwork();
     this.enableIntervalSync();
   }
 
@@ -102,6 +105,8 @@ export class DealerService {
         return issue;
       })
     }
+
+    saveRoomState(this.roomId, this.state);
 
     this.node.send({
       type: '__state',

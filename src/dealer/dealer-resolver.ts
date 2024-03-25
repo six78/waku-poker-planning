@@ -1,17 +1,42 @@
+import { IAppState } from '../app/app.state';
+import { RoomId } from '../room/room.model';
 import { getFromLocalStorage, saveToLocalStorage } from '../shared/local-storage';
+
+// TODO: bad file naming
+
+export function createDefaultAppState(): IAppState {
+  return {
+    players: [],
+    issues: [],
+    activeIssue: null,
+    revealResults: false
+  }
+}
+
+type IDealerRoomsList = Record<RoomId, IAppState>;
 
 const STORAGE_KEY = 'DEALER';
 
-export function isCurrentUserDealerForRoom(roomId: string): boolean {
+export function isCurrentUserDealerForRoom(roomId: RoomId): boolean {
   const rooms = getDealerRooms();
-  return rooms.some(room => room === roomId);
+  return rooms[roomId] !== undefined;
 }
 
-export function saveDealerRoom(roomId: string): void {
+export function getRoomState(roomId: RoomId): IAppState {
   const rooms = getDealerRooms();
-  saveToLocalStorage(STORAGE_KEY, [...rooms, roomId]);
+  return rooms[roomId] ?? createDefaultAppState();
 }
 
-function getDealerRooms(): string[] {
-  return getFromLocalStorage<string[]>(STORAGE_KEY) || [];
+export function createEmptyRoom(roomId: RoomId): void {
+  saveRoomState(roomId, createDefaultAppState());
+}
+
+export function saveRoomState(roomId: RoomId, state: IAppState): void {
+  const rooms = getDealerRooms();
+  rooms[roomId] = state;
+  saveToLocalStorage(STORAGE_KEY, rooms);
+}
+
+function getDealerRooms(): IDealerRoomsList {
+  return getFromLocalStorage<IDealerRoomsList>(STORAGE_KEY) || {};
 }

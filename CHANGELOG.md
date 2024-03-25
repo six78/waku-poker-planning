@@ -2,3 +2,4 @@
 
 - Dealer does not send player's estimates to network state before revealing
 - Player's estimation has a timestamp, thats allow to compare hidden estimations
+- Dealer stores room state in local storage, so after page refresh all data could be restored

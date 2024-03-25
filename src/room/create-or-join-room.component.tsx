@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Button, Card, Col, Divider, Input, InputRef, Row } from "antd";
 import { useNavigate } from "react-router-dom";
 import { generateHash } from "../shared/random-hash";
-import { saveDealerRoom } from "../dealer/dealer-resolver";
+import { createEmptyRoom } from "../dealer/dealer-resolver";
 
 export function CreateOrJoinRoom() {
   const input = useRef<InputRef>(null);
@@ -15,7 +15,7 @@ export function CreateOrJoinRoom() {
      * this is an ugly way to join the room as a host without passing the flag via url
      * try to find better solution
      */
-    saveDealerRoom(roomId);
+    createEmptyRoom(roomId);
     navigate(`/room/${roomId}`);
   }
 

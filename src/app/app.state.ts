@@ -9,23 +9,15 @@ export interface IAppState {
   revealResults: boolean;
 }
 
-export function createDefaultAppState(): IAppState {
-  return {
-    players: [],
-    issues: [],
-    activeIssue: null,
-    revealResults: false
-  }
-}
 
-const appState = atom<IAppState>({
+const appState = atom<IAppState | null>({
   key: 'appState',
-  default: createDefaultAppState()
+  default: null
 });
 
 // TODO: bad naming
-export const useAppState = () => useRecoilValue(appState);
-export const useUpdateAppState = () => useRecoilState(appState)[1];
+export const useAppState = () => useRecoilValue(appState)!;
+export const useUpdateAppState = () => useRecoilState(appState);
 
 export const useIssuesList = () => {
   const { issues } = useAppState();

@@ -3,10 +3,7 @@ import { Spin } from "antd";
 
 import { useParams } from "react-router-dom";
 import { getUserDataFromLocalStorage } from "./user/current-user";
-import {
-  WakuNodeService,
-  createWakuNodeService,
-} from "./waku/waku-node.service";
+import { createWakuNodeService } from "./waku/waku-node.service";
 import { PlayerService } from "./player/player.service";
 import { PlayerContext } from "./player/player.context";
 import { DealerServiceContext } from "./dealer/dealer.context";
@@ -29,9 +26,8 @@ export function App() {
   }
 
   const isDealer = isCurrentUserDealerForRoom(roomId);
-  const updateAppState = useUpdateAppState();
+  const [appState, updateAppState] = useUpdateAppState();
 
-  const [node, setNode] = useState<WakuNodeService | null>(null);
   const [playerService, setPlayerService] = useState<PlayerService | null>(
     null
   );
@@ -45,13 +41,16 @@ export function App() {
         return;
       }
 
-      setDealerService(isDealer ? new DealerService(node) : null);
-      setPlayerService(new PlayerService(node, user));
-      setNode(node);
+      const dealer = isDealer ? new DealerService(node, roomId) : null;
+      const player = new PlayerService(node, user);
+      player.onStateChanged(updateAppState).enableHeartBeat();
+
+      setDealerService(dealer);
+      setPlayerService(player);
     });
   }, [roomId, user, isDealer, updateAppState]);
 
-  return node ? (
+  return appState ? (
     <PlayerContext.Provider value={playerService}>
       <DealerServiceContext.Provider value={dealerService}>
         <Room />
