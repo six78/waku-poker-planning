@@ -3,6 +3,7 @@ import { WakuNodeService } from '../waku/waku-node.service';
 import { IPlayerOnlineMessage, IPlayerVoteMessage } from '../app/app-waku-message.model';
 import { IAppState, createDefaultAppState } from '../app/app.state';
 import { Estimation } from '../voting/voting.model';
+import { toArray, toDictionary } from '../shared/object';
 
 
 // TODO: why this decorator not working?
@@ -35,6 +36,8 @@ export class DealerService {
           break;
       }
     })
+
+    this.enableIntervalSync();
   }
 
   public startVoting(issue: IIssue): void {
@@ -62,7 +65,6 @@ export class DealerService {
     this.state.revealResults = false;
     this.state.activeIssue = null;
     this.sendStateToNetwork();
-
   }
 
   public revote(): void {
@@ -70,7 +72,7 @@ export class DealerService {
 
     if (activeIssue) {
       activeIssue.result = null;
-      activeIssue.votes = {};
+      activeIssue.votes = [];
       this.sendStateToNetwork();
     }
 
@@ -83,10 +85,34 @@ export class DealerService {
   }
 
   public sendStateToNetwork(): void {
+    let state = this.state;
+
+    if (state.revealResults === false && state.activeIssue) {
+      state = JSON.parse(JSON.stringify(this.state));
+      state.issues = state.issues.map(issue => {
+        if (issue.id === state.activeIssue) {
+          issue.votes = issue.votes.map(vote => {
+            return {
+              ...vote,
+              estimation: null
+            }
+          })
+        }
+
+        return issue;
+      })
+    }
+
     this.node.send({
       type: '__state',
-      state: this.state
+      state
     })
+  }
+
+  private enableIntervalSync(): void {
+    setInterval(() => {
+      this.sendStateToNetwork();
+    }, 10000);
   }
 
   private onPlayerOnline(message: IPlayerOnlineMessage): void {
@@ -107,12 +133,15 @@ export class DealerService {
       return;
     }
 
-    if (message.voteResult === null) {
-      delete activeIssue.votes[message.voteBy];
+    const votes = toDictionary(activeIssue.votes, 'voteBy');
+
+    if (message.vote.estimation === null) {
+      delete votes[message.vote.voteBy];
     } else {
-      activeIssue.votes[message.voteBy] = message.voteResult;
+      votes[message.vote.voteBy] = message.vote;
     }
 
+    activeIssue.votes = toArray(votes);
     this.sendStateToNetwork();
   }
 

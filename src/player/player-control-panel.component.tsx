@@ -1,95 +1,56 @@
 import { Card, Divider, Space, Typography } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { usePlayer } from "./player.context";
 import { getFibonacciValues } from "../voting/strategy/fibonacci-strategy";
 import { VoteOption } from "../voting/vote-option.component";
-import { Estimation } from "../voting/voting.model";
-import useMessage from "antd/es/message/useMessage";
-import { appConfig } from "../app/app.config";
+import { Estimation, IVote } from "../voting/voting.model";
 import { PlayersList } from "./players-list.component";
 import { IIssue } from "../issue/issue.model";
-
-const TIMEOUT = 10000;
+import { toDictionary } from "../shared/object";
 
 export function PlayerControlPanel(props: { issue: IIssue }) {
   const { issue } = props;
-  const [messageApi, contextHolder] = useMessage();
   const player = usePlayer()!;
 
-  // Player vote stored in the game state
-  const appliedVote = (issue.votes || {})[player.playerId];
-  // Player vote on player's device that didn't reach the game state
-  const [pendingVote, setPendingVote] = useState<Estimation | null>(null);
-  const [revokedVote, setRevokedVote] = useState<Estimation | null>(null);
+  const activeVoteOnNetwork = useMemo(
+    () => toDictionary(issue.votes, "voteBy")[player.playerId] || null,
+    [issue, player]
+  );
 
-  const timeoutId = useRef<NodeJS.Timeout | null>(null);
+  const [activeVoteOnDevice, setActiveVoteOnDevice] = useState<Omit<
+    IVote,
+    "voteBy"
+  > | null>(null);
+
+  const [pendingEstimation, setPendingEstimation] = useState<Estimation | null>(
+    null
+  );
 
   useEffect(() => {
-    return () => {
-      clearTimeoutIfExists();
-    };
-  }, []);
+    const isEstimationWasCleaned =
+      activeVoteOnDevice?.estimation === null && activeVoteOnNetwork === null;
+    const isEstimationWasApplied =
+      activeVoteOnDevice?.timestamp === activeVoteOnNetwork?.timestamp;
 
-  useEffect(() => {
-    if (revokedVote) {
-      if (!appliedVote) {
-        setPendingVote(null);
-        setRevokedVote(null);
-      }
-
-      return;
+    if (isEstimationWasCleaned || isEstimationWasApplied) {
+      setPendingEstimation(null);
     }
-
-    if (appliedVote === pendingVote) {
-      clearTimeoutIfExists();
-      setPendingVote(null);
-    }
-  }, [appliedVote, pendingVote, revokedVote]);
-
-  function submitVote(value: Estimation): void {
-    setRevokedVote(null);
-    setPendingVote(value);
-    sendVote(value);
-  }
-
-  function revokeVote(value: Estimation): void {
-    setRevokedVote(value);
-    setPendingVote(value);
-    sendVote(null);
-  }
-
-  function sendVote(value: Estimation | null): void {
-    player.vote(issue.id, value);
-    clearTimeoutIfExists();
-    timeoutId.current = setTimeout(() => {
-      messageApi.error(
-        `Vote was not applied for ${TIMEOUT} ms, Please revote`,
-        appConfig.messageTimeout
-      );
-      setRevokedVote(null);
-      setPendingVote(null);
-    }, TIMEOUT);
-  }
+  }, [activeVoteOnDevice, activeVoteOnNetwork]);
 
   function handleClick(value: Estimation): void {
-    if (pendingVote) {
+    if (pendingEstimation) {
       // There are many problems with event races
       return;
     }
 
-    const isRevoking = value === appliedVote;
-    isRevoking ? revokeVote(value) : submitVote(value);
-  }
-
-  function clearTimeoutIfExists(): void {
-    if (timeoutId.current) {
-      clearTimeout(timeoutId.current);
-    }
+    const isRevoking = value === activeVoteOnDevice?.estimation;
+    const result = player.vote(issue.id, isRevoking ? null : value);
+    setActiveVoteOnDevice(result);
+    setPendingEstimation(value);
   }
 
   return (
     <Card>
-      {contextHolder}
       {issue && (
         <Space direction="vertical" className="w-full">
           <Typography.Text>Players votes:</Typography.Text>
@@ -101,8 +62,10 @@ export function PlayerControlPanel(props: { issue: IIssue }) {
               <VoteOption
                 onClick={handleClick.bind(undefined, x)}
                 key={x}
-                showLoader={x === pendingVote}
-                active={x === appliedVote}
+                showLoader={x === pendingEstimation}
+                active={
+                  x === activeVoteOnDevice?.estimation && !pendingEstimation
+                }
               >
                 {x}
               </VoteOption>

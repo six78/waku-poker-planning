@@ -2,6 +2,7 @@ import { Space, Tag } from "antd";
 import { usePlayer } from "./player.context";
 import { ReactNode } from "react";
 import { useActiveIssue, useAppState } from "../app/app.state";
+import { toDictionary } from "../shared/object";
 
 export function PlayerTag(props: {
   children: ReactNode;
@@ -20,11 +21,12 @@ export function PlayersList() {
   const currentPlayer = usePlayer();
   const { players } = useAppState();
   const activeIssue = useActiveIssue();
+  const votes = toDictionary(activeIssue?.votes || [], "voteBy");
 
   return (
     <Space>
       {players.map((player) => {
-        const playerEstimation = (activeIssue?.votes || {})[player.id];
+        const playerEstimation = votes[player.id];
 
         return (
           <PlayerTag

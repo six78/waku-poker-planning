@@ -1,33 +1,32 @@
 import { Button, Modal, Space } from "antd";
-import { IPlayer, PlayerId, PlayerName } from "../player/player.model";
+import { IPlayer, PlayerName } from "../player/player.model";
 import { PlayerTag } from "../player/players-list.component";
 import { VoteOption } from "./vote-option.component";
-import { Estimation } from "./voting.model";
+import { Estimation, IVote } from "./voting.model";
 import { useState } from "react";
 import { useDealer } from "../dealer/dealer.context";
 import { useActiveIssue, usePlayersList } from "../app/app.state";
+import { toDictionary } from "../shared/object";
 
 interface IEstimation {
   label: string;
   votedBy: PlayerName[];
-  value: Estimation | undefined;
+  value: Estimation | null;
 }
 
-function calculateResults(
-  players: IPlayer[],
-  votes: { [key: PlayerId]: Estimation }
-): IEstimation[] {
+function calculateResults(players: IPlayer[], votes: IVote[]): IEstimation[] {
   const map: { [key: string]: IEstimation } = {};
+  const votesHashByPlayer = toDictionary(votes, "voteBy");
 
   players.map((player) => {
-    const esimation = votes[player.id];
-    const estimationLabel = esimation || "No votes";
+    const esimation = votesHashByPlayer[player.id];
+    const estimationLabel = esimation?.estimation || "No votes";
 
     if (!map[estimationLabel]) {
       map[estimationLabel] = {
         label: estimationLabel,
         votedBy: [],
-        value: esimation,
+        value: esimation.estimation,
       };
     }
 

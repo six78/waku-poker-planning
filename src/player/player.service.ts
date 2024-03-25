@@ -1,6 +1,7 @@
 import { IPlayerVoteMessage } from '../app/app-waku-message.model';
 import { IAppState } from '../app/app.state';
-import { Estimation } from '../voting/voting.model';
+import { getCurrentTimestamp } from '../shared/timestamp';
+import { Estimation, IVote } from '../voting/voting.model';
 import { WakuNodeService } from '../waku/waku-node.service';
 import { IPlayer, PlayerId, PlayerName } from './player.model';
 
@@ -16,15 +17,25 @@ export class PlayerService {
     this.sendPlayerIsOnlineMessage();
   }
 
-  public vote(voteFor: string, voteResult: Estimation | null): void {
+  public vote(voteFor: string, voteResult: Estimation | null): Omit<IVote, "voteBy"> {
+    const timestamp = getCurrentTimestamp();
+
     const message: IPlayerVoteMessage = {
       type: '__player_vote',
-      voteBy: this.playerId,
       voteFor,
-      voteResult
+      vote: {
+        timestamp,
+        voteBy: this.playerId,
+        estimation: voteResult,
+      }
     };
 
     this.node.send(message);
+
+    return {
+      timestamp,
+      estimation: voteResult
+    }
   }
 
   public onStateChanged(callback: (state: IAppState) => void): this {
