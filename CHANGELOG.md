@@ -1,9 +1,11 @@
-# 2024-03-26
+# Changelog
+
+## 2024-03-26
 
 - Dealer can see list of previous games at the start screen
 - Dealer can delete issue from issues list
 
-# 2024-03-24
+## 2024-03-24
 
 - Dealer does not send player's estimates to network before revealing
 - Player's estimation has a timestamp, thats allow to compare hidden estimations
