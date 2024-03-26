@@ -1,4 +1,4 @@
-import { IIssue } from '../issue/issue.model';
+import { IIssue, IssueId } from '../issue/issue.model';
 import { WakuNodeService } from '../waku/waku-node.service';
 import { IPlayerOnlineMessage, IPlayerVoteMessage } from '../app/app-waku-message.model';
 import { IAppState } from '../app/app.state';
@@ -86,6 +86,11 @@ export class DealerService {
 
   public addIssue(issue: IIssue): void {
     this.state.issues.push(issue);
+    this.sendStateToNetwork();
+  }
+
+  public removeIssue(issueId: IssueId): void {
+    this.state.issues = this.state.issues.filter(x => x.id !== issueId);
     this.sendStateToNetwork();
   }
 

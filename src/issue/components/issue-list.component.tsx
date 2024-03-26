@@ -1,4 +1,4 @@
-import { Button, Empty, Progress, Space, Tooltip } from "antd";
+import { Button, Empty, Popconfirm, Progress, Space, Tooltip } from "antd";
 import {
   CheckCircleOutlined,
   DeleteOutlined,
@@ -15,7 +15,7 @@ import {
   useIssuesList,
   usePlayersList,
 } from "../../app/app.state";
-import { IIssue } from "../issue.model";
+import { IIssue, IssueId } from "../issue.model";
 import { isUrl } from "../../shared/url";
 
 function getDescription(
@@ -60,6 +60,10 @@ export function IssueList() {
     );
   }
 
+  function deleteIssue(issueId: IssueId): void {
+    dealer?.removeIssue(issueId);
+  }
+
   return (
     <Space
       direction="vertical"
@@ -73,7 +77,16 @@ export function IssueList() {
           actions={
             dealer
               ? [
-                  <DeleteOutlined key="setting" />,
+                  <Popconfirm
+                    title="Delete the issue"
+                    description="Are you sure to delete this issue?"
+                    onConfirm={deleteIssue.bind(undefined, x.id)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <DeleteOutlined />
+                  </Popconfirm>,
+
                   <>
                     {activeIssue?.id === x.id ? (
                       <Button
