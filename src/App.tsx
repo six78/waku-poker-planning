@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Spin } from "antd";
 
 import { useParams } from "react-router-dom";
@@ -16,6 +16,8 @@ import { useUpdateAppState } from "./app/app.state";
 export function App() {
   const { id: roomId } = useParams();
   const user = useMemo(getUserDataFromLocalStorage, []);
+  const playerServiceRef = useRef<PlayerService | null>(null);
+  const dealerServiceRef = useRef<DealerService | null>(null);
 
   if (!roomId || !user) {
     throw new Error(
@@ -24,6 +26,14 @@ export function App() {
       )}`
     );
   }
+
+  useEffect(() => {
+    return () => {
+      playerServiceRef.current?.beforeDestroy();
+      dealerServiceRef.current?.beforeDestroy();
+      updateAppState(null);
+    };
+  }, []);
 
   const isDealer = isCurrentUserDealerForRoom(roomId);
   const [appState, updateAppState] = useUpdateAppState();
@@ -41,12 +51,15 @@ export function App() {
         return;
       }
 
-      const dealer = isDealer ? new DealerService(node, roomId) : null;
-      const player = new PlayerService(node, user);
-      player.onStateChanged(updateAppState).enableHeartBeat();
+      dealerServiceRef.current = isDealer
+        ? new DealerService(node, roomId)
+        : null;
+      playerServiceRef.current = new PlayerService(node, user);
 
-      setDealerService(dealer);
-      setPlayerService(player);
+      playerServiceRef.current.onStateChanged(updateAppState).enableHeartBeat();
+
+      setDealerService(dealerServiceRef.current);
+      setPlayerService(playerServiceRef.current);
     });
   }, [roomId, user, isDealer, updateAppState]);
 

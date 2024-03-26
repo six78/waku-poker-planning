@@ -25,6 +25,8 @@ import { getRoomState, saveRoomState } from './dealer-resolver';
 
 export class DealerService {
   private state: IAppState;
+  private syncIntervalId: NodeJS.Timeout;
+
   constructor(private readonly node: WakuNodeService, private readonly roomId: RoomId) {
     this.state = getRoomState(roomId);
 
@@ -40,7 +42,7 @@ export class DealerService {
     })
 
     this.sendStateToNetwork();
-    this.enableIntervalSync();
+    this.syncIntervalId = this.enableIntervalSync();
   }
 
   public startVoting(issue: IIssue): void {
@@ -114,8 +116,13 @@ export class DealerService {
     })
   }
 
-  private enableIntervalSync(): void {
-    setInterval(() => {
+  public beforeDestroy(): void {
+    clearInterval(this.syncIntervalId);
+    this.node.stop();
+  }
+
+  private enableIntervalSync(): NodeJS.Timeout {
+    return setInterval(() => {
       this.sendStateToNetwork();
     }, 10000);
   }

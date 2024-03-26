@@ -10,6 +10,8 @@ export class PlayerService {
   public readonly playerId: PlayerId;
   public readonly playerName: PlayerName;
 
+  private heartbeatIntervalId: NodeJS.Timeout | undefined;
+
   constructor(private readonly node: WakuNodeService, player: IPlayer) {
     this.playerId = player.id;
     this.playerName = player.name;
@@ -50,11 +52,18 @@ export class PlayerService {
   }
 
   public enableHeartBeat(): this {
-    setInterval(() => {
-      this.sendPlayerIsOnlineMessage()
-    }, 10 * 1000);
+    if (!this.heartbeatIntervalId) {
+      this.heartbeatIntervalId = setInterval(() => {
+        this.sendPlayerIsOnlineMessage()
+      }, 10 * 1000);
+    }
 
     return this;
+  }
+
+  public beforeDestroy(): void {
+    clearInterval(this.heartbeatIntervalId);
+    this.node.stop();
   }
 
   private sendPlayerIsOnlineMessage(): void {

@@ -20,7 +20,8 @@ logLevel.set(LogLevel.All, [MESSAGE.STATE, MESSAGE.PLAYER_ONLINE, MESSAGE.PLAYER
 
 interface IWakuLightNode {
   filter: Pick<IFilter, 'subscribe'>,
-  lightPush: Pick<ILightPush, 'send'>
+  lightPush: Pick<ILightPush, 'send'>,
+  stop: () => void
 }
 
 class WakuFakeLightNode implements IWakuLightNode {
@@ -38,6 +39,10 @@ class WakuFakeLightNode implements IWakuLightNode {
   public lightPush = {
     send: this.send
   };
+
+  public stop() {
+
+  }
 }
 
 export async function createWakuNodeService(contentTopic: string): Promise<WakuNodeService> {
@@ -116,6 +121,10 @@ export class WakuNodeService {
 
   public subscribe(callback: (message: IMessage) => void): void {
     this.callbacks.push(callback);
+  }
+
+  public stop(): void {
+    this.node.stop();
   }
 
   private encodeUtf8(message: string): Uint8Array {
