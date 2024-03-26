@@ -1,12 +1,13 @@
 import { useRef } from "react";
-import { Button, Card, Col, Divider, Input, InputRef, Row } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Button, Card, Col, Divider, Input, InputRef, Row, Space } from "antd";
 import { generateHash } from "../shared/random-hash";
 import { createEmptyRoom } from "../dealer/dealer-resolver";
+import { RoomsList } from "./rooms-list.component";
+import { useNavigateToRoom } from "../app/app.router";
 
 export function CreateOrJoinRoom() {
   const input = useRef<InputRef>(null);
-  const navigate = useNavigate();
+  const navigateToRoom = useNavigateToRoom();
 
   function createNewGame() {
     const roomId = generateHash();
@@ -16,24 +17,20 @@ export function CreateOrJoinRoom() {
      * try to find better solution
      */
     createEmptyRoom(roomId);
-    navigate(`/room/${roomId}`);
+    navigateToRoom(roomId);
   }
 
   function join() {
     const roomId = input.current?.input?.value.trim();
     if (roomId) {
-      navigate(`/room/${roomId}`);
+      navigateToRoom(`/room/${roomId}`);
     }
   }
 
   return (
     <div className="w-scren h-screen flex justify-center items-center">
       <Card className="w-1/3">
-        <div className="flex flex-col items-center">
-          <Button onClick={createNewGame} type="primary" className="mt-4">
-            Create new room as a dealer
-          </Button>
-          <Divider>or</Divider>
+        <Space direction="vertical" size="middle" style={{ display: "flex" }}>
           <Row className="w-full">
             <Col span={18}>
               <Input
@@ -48,7 +45,20 @@ export function CreateOrJoinRoom() {
               </Button>
             </Col>
           </Row>
-        </div>
+          <Divider>or</Divider>
+
+          <div className="flex flex-col items-center">
+            <Button
+              onClick={createNewGame}
+              type="primary"
+              className="self-center"
+            >
+              Create new room as a dealer
+            </Button>
+          </div>
+
+          <RoomsList></RoomsList>
+        </Space>
       </Card>
     </div>
   );
